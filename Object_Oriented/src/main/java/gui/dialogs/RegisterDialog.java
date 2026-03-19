@@ -7,27 +7,40 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Dialogo modale per la registrazione di un nuovo utente.
- * Gestisce l'input di username e password, la validazione dei dati
- * e la comunicazione con il controller per la creazione dell'account.
+ * Rappresenta la finestra di dialogo modale adibita alla registrazione di un nuovo profilo utente.
+ * Coordina l'acquisizione delle credenziali (username e password), implementa i protocolli di
+ * validazione della robustezza dei dati e gestisce la comunicazione bidirezionale con il
+ * controller per la persistenza dell'account, garantendo il rispetto dei vincoli di sicurezza.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class RegisterDialog extends JDialog {
 
+    /** Il riferimento al gestore della logica di business per le operazioni di registrazione. */
     private final transient Controller controller;
+
+    /** Il campo di input testuale per l'immissione dell'username desiderato. */
     private JTextField txtUsername;
+
+    /** Il campo di input protetto per l'immissione della password. */
     private JPasswordField txtPassword;
+
+    /** Il campo di input protetto per la conferma della password, atto a prevenire refusi di battitura. */
     private JPasswordField txtConfirmPassword;
 
+    /** Costante testuale utilizzata come intestazione per i messaggi di errore critico. */
     private static final String ERROR = "Errore";
 
     /**
-     * Costruisce il dialogo di registrazione.
+     * Inizializza il dialogo di registrazione impostando la modalità di blocco (modal)
+     * e configurando il posizionamento relativo rispetto al frame chiamante.
      *
-     * @param parent     Il frame genitore (per centrare il dialogo).
-     * @param controller Il controller per gestire la logica di registrazione.
+     * @param parent     Il frame genitore utilizzato per l'ancoraggio visivo e la centratura.
+     * @param controller Il riferimento al Controller per l'inoltro della richiesta di creazione profilo.
      */
     public RegisterDialog(Frame parent, Controller controller) {
-        super(parent, "Nuovo utente", true); // Modale
+        super(parent, "Nuovo utente", true); // Definizione del comportamento modale
         this.controller = controller;
 
         initUI();
@@ -38,9 +51,9 @@ public class RegisterDialog extends JDialog {
     }
 
     /**
-     * Inizializza l'interfaccia utente del dialogo di registrazione.
-     * Predispone i campi di testo per le credenziali, include i suggerimenti per la
-     * sicurezza della password e configura i pulsanti di azione con i relativi listener.
+     * Struttura gerarchicamente l'interfaccia utente del dialogo sfruttando un layout a griglia.
+     * Predispone i controlli di input, integra suggerimenti visivi sulla complessità della
+     * password e configura i trigger di azione (Registrati/Annulla) con i rispettivi gestori di evento.
      */
     private void initUI() {
         JPanel panel = new JPanel(new GridBagLayout());
@@ -61,9 +74,9 @@ public class RegisterDialog extends JDialog {
         gbc.insets = new Insets(20, 10, 20, 10);
         panel.add(lblTitle, gbc);
 
-        // Reset constraints
+        // Ripristino vincoli standard
         gbc.gridwidth = 1;
-        gbc.insets = new Insets(5, 15, 5, 5); // Spazio standard
+        gbc.insets = new Insets(5, 15, 5, 5);
 
         // --- USERNAME ---
         gbc.gridy++;
@@ -83,10 +96,10 @@ public class RegisterDialog extends JDialog {
         txtPassword = GuiUtils.createPasswordField(15);
         panel.add(GuiUtils.createPasswordPanelWithEye(txtPassword), gbc);
 
-        // Info Password (Text Block Java 15+)
+        // Informativa sui requisiti di sicurezza (Text Block Java 15+)
         gbc.gridy++;
         gbc.gridx = 1;
-        gbc.insets = new Insets(0, 15, 10, 5); // Meno spazio sopra
+        gbc.insets = new Insets(0, 15, 10, 5);
 
         JLabel lblInfoPass = new JLabel("""
                 <html><font size='3' color='gray'>
@@ -99,7 +112,7 @@ public class RegisterDialog extends JDialog {
         // --- CONFERMA PASSWORD ---
         gbc.gridy++;
         gbc.gridx = 0;
-        gbc.insets = new Insets(5, 15, 5, 5); // Ripristina margine
+        gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(GuiUtils.createLabel("Conferma:"), gbc);
 
         gbc.gridx = 1;
@@ -109,7 +122,7 @@ public class RegisterDialog extends JDialog {
         // --- BOTTONI ---
         gbc.gridy++;
         gbc.gridx = 0;
-        gbc.gridwidth = 2; // Occupa tutta la larghezza per il pannello bottoni
+        gbc.gridwidth = 2;
         gbc.insets = new Insets(25, 15, 15, 15);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
@@ -123,7 +136,7 @@ public class RegisterDialog extends JDialog {
         GuiUtils.stylePrimaryButton(btnRegister);
         btnRegister.addActionListener(e -> performRegistration());
 
-        GuiUtils.makeSameSize(btnCancel, btnRegister); // Uniforma dimensioni
+        GuiUtils.makeSameSize(btnCancel, btnRegister);
 
         btnPanel.add(btnCancel);
         btnPanel.add(btnRegister);
@@ -131,22 +144,23 @@ public class RegisterDialog extends JDialog {
 
         add(panel);
 
-        // Tasto Invio attiva la registrazione
+        // Imposta il pulsante di registrazione come azione predefinita alla pressione del tasto Invio
         this.getRootPane().setDefaultButton(btnRegister);
     }
 
     /**
-     * Esegue la procedura logica per la registrazione di un nuovo profilo utente.
-     * Valida la conformità dei dati inseriti rispetto ai requisiti di sistema (lunghezza,
-     * caratteri speciali, corrispondenza password) e inoltra la richiesta al controller
-     * gestendo eventuali errori di duplicazione o problemi tecnici del database.
+     * Coordina la procedura logica per la creazione di un nuovo profilo utente.
+     * Implementa un meccanismo di validazione "fail-fast" su parametri quali lunghezza,
+     * corrispondenza delle password e conformità ai criteri di sicurezza prima di
+     * interrogare il database, riducendo il carico di rete e gestendo puntualmente
+     * le eccezioni di business (es. username già occupato).
      */
     private void performRegistration() {
         String user = txtUsername.getText().trim();
         String pass = new String(txtPassword.getPassword());
         String confirmPass = new String(txtConfirmPassword.getPassword());
 
-        // Validazioni locali (rimangono invariate per non pesare sul DB)
+        // Validazioni di integrità locali
         if (user.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Compila tutti i campi!", "Campi mancanti", JOptionPane.WARNING_MESSAGE);
             return;
@@ -167,11 +181,10 @@ public class RegisterDialog extends JDialog {
             return;
         }
 
-        // Chiamata al Controller con gestione Eccezioni
         try {
+            // Tentativo di persistenza tramite controller
             controller.register(user, pass);
 
-            // Se non vengono lanciate eccezioni, la registrazione è riuscita
             JOptionPane.showMessageDialog(this,
                     "Registrazione completata con successo!\nOra puoi effettuare il login.",
                     "Successo",
@@ -179,24 +192,25 @@ public class RegisterDialog extends JDialog {
             dispose();
 
         } catch (exception.UserAlreadyExistsException ex) {
-            // Gestione nome duplicato
+            // Intercettazione specifica per violazione di univocità dello username
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Errore registrazione", JOptionPane.WARNING_MESSAGE);
         } catch (java.sql.SQLException ex) {
-            // Gestione errore database
+            // Gestione di anomalie a livello di connessione o driver DB
             JOptionPane.showMessageDialog(this, "Errore tecnico durante la registrazione.", "Errore DB", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
-            // Errore generico
+            // Cattura di eccezioni impreviste (paracadute di sicurezza)
             JOptionPane.showMessageDialog(this, "Si è verificato un errore imprevisto.", ERROR, JOptionPane.ERROR_MESSAGE);
         }
     }
 
     /**
-     * Verifica se la stringa della password soddisfa i criteri minimi di complessità richiesti.
-     * Il controllo accerta la presenza di numeri, lettere maiuscole, minuscole,
-     * caratteri speciali e l'assenza di spazi bianchi, in un range di 8-24 caratteri.
+     * Valuta se la stringa della password rispetta i criteri di complessità algoritmica definiti.
+     * Sfrutta un'espressione regolare (Regex) per accertare contemporaneamente la presenza di
+     * cifre, lettere (maiuscole/minuscole) e caratteri speciali, garantendo un elevato
+     * standard di protezione degli account.
      *
      * @param password La stringa testuale della password da sottoporre a verifica.
-     * @return {@code true} se la password rispetta tutti i criteri di sicurezza, {@code false} altrimenti.
+     * @return {@code true} se la stringa soddisfa tutti i requisiti di sicurezza imposti; {@code false} altrimenti.
      */
     private boolean isValidPassword(String password) {
         String regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!._-])(?=\\S+$).{8,24}$";

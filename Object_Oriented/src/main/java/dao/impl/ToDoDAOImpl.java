@@ -12,9 +12,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Implementazione concreta dell'interfaccia ToDoDAO.
+ * Implementazione concreta dell'interfaccia {@link ToDoDAO}.
  * Gestisce tutte le operazioni CRUD e le logiche di business (come lo spostamento
- * dell'ordine o la gestione dei collaboratori) interagendo in modo sicuro con il database.
+ * dell'ordine o la gestione dei collaboratori) interagendo in modo sicuro con il database relazionale.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class ToDoDAOImpl implements ToDoDAO {
 
@@ -37,10 +40,17 @@ public class ToDoDAOImpl implements ToDoDAO {
     private static final String COL_ROLE = "role";
 
     /**
-     * Calcola la prossima posizione disponibile per un task all'interno di una specifica bacheca.
+     * Inizializza l'implementazione del Data Access Object per i task.
+     */
+    public ToDoDAOImpl() {
+        // Costruttore di default necessario per la generazione del Javadoc
+    }
+
+    /**
+     * {@inheritDoc}
      *
      * @param boardId L'identificativo della bacheca.
-     * @return Il valore massimo dell'ordine attuale incrementato di 1. Restituisce 1 se vuota.
+     * @return Il valore massimo dell'ordine attuale incrementato di 1. Restituisce 1 se la bacheca è vuota o in caso di errore SQL.
      */
     @Override
     public int getNextPosition(int boardId) {
@@ -59,12 +69,13 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Crea un nuovo ToDo nel database garantendo l'atomicità dell'operazione.
-     * La transazione copre l'inserimento del record e
+     * {@inheritDoc}
+     * La transazione garantisce l'atomicità tra l'inserimento del record principale e
      * l'associazione degli eventuali collaboratori.
      *
      * @param todo L'oggetto ToDo contenente i dati da persistere.
-     * @return {@code true} se la transazione viene completata con successo, {@code false} altrimenti.
+     * @return {@code true} se la transazione viene completata con successo;
+     * {@code false} se si verifica un errore SQL, causando un rollback automatico.
      */
     @Override
     public boolean createToDo(ToDo todo) {
@@ -96,14 +107,14 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Aggiorna un ToDo esistente mediante transazione.
+     * {@inheritDoc}
      * Modifica i dati base e risincronizza la lista dei collaboratori eliminando
-     * le vecchie associazioni e inserendo le nuove.
+     * le vecchie associazioni e inserendo le nuove in un'unica transazione.
      *
      * @param todo L'oggetto ToDo con i dati aggiornati.
-     * @return {@code true} se l'aggiornamento ha successo, {@code false} altrimenti.
-     * @throws SQLException Se il database blocca l'operazione a causa della violazione
-     * di un check constraint (es. 'check_expiry_after_created').
+     * @return {@code true} se l'aggiornamento ha successo e la transazione viene confermata;
+     * {@code false} in caso di errore generico con conseguente rollback.
+     * @throws SQLException Se il database blocca l'operazione a causa della violazione di un check constraint (es. data di scadenza invalida).
      */
     @Override
     public boolean updateToDo(ToDo todo) throws SQLException {
@@ -136,10 +147,11 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Elimina fisicamente un task dal database.
+     * {@inheritDoc}
      *
      * @param todoId L'identificativo univoco del task.
-     * @return {@code true} se l'eliminazione ha successo.
+     * @return {@code true} se l'eliminazione ha successo;
+     * {@code false} se il record non esiste o si verifica un errore SQL.
      */
     @Override
     public boolean deleteToDo(int todoId) {
@@ -157,11 +169,12 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Alterna o imposta lo stato di completamento di un determinato task.
+     * {@inheritDoc}
      *
      * @param todoId      L'identificativo del task.
      * @param isCompleted Il nuovo stato booleano di completamento.
-     * @return {@code true} se l'aggiornamento ha successo.
+     * @return {@code true} se l'aggiornamento ha successo;
+     * {@code false} se il record non viene trovato o in caso di errore SQL.
      */
     @Override
     public boolean toggleCompletion(int todoId, boolean isCompleted) {
@@ -180,10 +193,11 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Apre una nuova connessione al database per recuperare i collaboratori di un task.
+     * {@inheritDoc}
+     * Apre una nuova connessione al database per il recupero dei dati.
      *
      * @param todoId L'identificativo del task.
-     * @return Una lista di username associati come collaboratori.
+     * @return Una lista di username associati come collaboratori. Restituisce una lista vuota (<b>mai null</b>) in caso di errore SQL.
      */
     @Override
     public List<String> getCollaborators(int todoId) {
@@ -197,17 +211,15 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Sposta un task in una nuova bacheca su richiesta del proprietario.
+     * {@inheritDoc}
      * L'operazione, gestita tramite un'unica transazione atomica, aggiorna la bacheca fisica
-     * e la posizione per il proprietario (tabella todos), e contemporaneamente ricalcola
-     * l'ordine di posizionamento per tutti i collaboratori (tabella shared_todos)
-     * nella loro rispettiva bacheca di destinazione.
+     * e la posizione per il proprietario, ricalcolando contemporaneamente l'ordine per i collaboratori.
      *
      * @param todoId        L'identificativo univoco del task da spostare.
-     * @param targetBoardId L'identificativo della bacheca di destinazione in cui inserire il task.
+     * @param targetBoardId L'identificativo della bacheca di destinazione.
      * @param currentUserId L'ID del proprietario che richiede ed esegue lo spostamento.
-     * @return {@code true} se l'intera transazione viene completata con successo,
-     * {@code false} in caso di errori di connessione al database o fallimento dell'aggiornamento.
+     * @return {@code true} se l'intera transazione viene completata con successo;
+     * {@code false} in caso di errori SQL o fallimento dell'aggiornamento.
      */
     @Override
     public boolean updateBoardId(int todoId, int targetBoardId, int currentUserId) {
@@ -224,16 +236,14 @@ public class ToDoDAOImpl implements ToDoDAO {
      * Gestisce l'aggiornamento del record del proprietario e propaga l'aggiornamento a cascata
      * sulle posizioni dei collaboratori, garantendo l'integrità relazionale dei dati tramite
      * commit esplicito o rollback in caso di fallimento.
-     * Disabilita temporaneamente la modalità di auto-commit per raggruppare le istruzioni.
      *
      * @param conn          La connessione al database attiva da utilizzare per l'operazione.
      * @param todoId        L'identificativo univoco del task da aggiornare.
      * @param targetBoardId L'identificativo della nuova bacheca di destinazione.
      * @param currentUserId L'ID dell'utente proprietario, necessario per calcolare correttamente il nuovo ordine visivo.
-     * @return {@code true} se i record vengono aggiornati e la transazione viene confermata,
+     * @return {@code true} se i record vengono aggiornati e la transazione viene confermata;
      * {@code false} se il task originale non viene trovato e la transazione viene annullata.
-     * @throws SQLException Se si verifica un errore durante la preparazione o l'esecuzione delle query;
-     * in tal caso esegue automaticamente il rollback prima di propagare l'eccezione.
+     * @throws SQLException Se si verifica un errore durante l'esecuzione delle query (esegue automaticamente il rollback prima di propagare l'eccezione).
      */
     private boolean executeUpdateBoardTransaction(Connection conn, int todoId, int targetBoardId, int currentUserId) throws SQLException {
         String sqlOwner = "UPDATE todos SET board_id = ?, " +
@@ -281,22 +291,18 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Recupera i ToDo filtrati per titolo della bacheca e visibilità dell'utente.
-     * Interroga la vista unificata del database per estrarre sia i task di cui l'utente è proprietario
-     * sia quelli condivisi, delegando al database il filtraggio tramite il campo unificato del visualizzatore.
-     * Ordina i risultati finali basandosi esclusivamente sull'indice di posizionamento
-     * per riflettere fedelmente l'ordine personalizzato stabilito dall'utente.
+     * {@inheritDoc}
+     * Interroga la vista unificata del database per estrarre sia i task proprietari sia quelli condivisi,
+     * ordinandoli in base allo stato di completamento e all'indice di posizionamento visivo.
      *
      * @param boardTitle    Il titolo della bacheca target.
-     * @param currentUserId L'ID dell'utente corrente per la verifica dei permessi e della visibilità.
-     * @return Una lista di oggetti ToDo estratti e mappati dalla vista.
+     * @param currentUserId L'ID dell'utente corrente per la verifica della visibilità.
+     * @return Una lista di oggetti ToDo estratti dalla vista. Restituisce una lista vuota (<b>mai null</b>) in caso di errore SQL o assenza di task.
      */
     @Override
     public List<ToDo> getTodosByBoardTitle(String boardTitle, int currentUserId) {
         List<ToDo> todos = new ArrayList<>();
 
-        // La query risulta snellita: rimuove la DISTINCT e sfrutta il viewer_id
-        // per accorpare i controlli di OWNER e SHARED in un'unica condizione.
         String sql = "SELECT todo_id, title, description, expiry_date, priority, " +
                 "is_completed, url_link, image_path, background_color, position_order, board_id, owner_username, role " +
                 "FROM v_user_visible_todos " +
@@ -307,7 +313,6 @@ public class ToDoDAOImpl implements ToDoDAO {
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            // Assegna esclusivamente i due parametri necessari
             pstmt.setString(1, boardTitle);
             pstmt.setInt(2, currentUserId);
 
@@ -342,10 +347,10 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Estrae il percorso fisico dell'immagine associata al task specificato.
+     * {@inheritDoc}
      *
      * @param todoId L'identificativo univoco del task.
-     * @return Il percorso dell'immagine come stringa, o null se assente.
+     * @return Il percorso dell'immagine come stringa; {@code null} se assente o in caso di errore SQL.
      */
     @Override
     public String getImagePath(int todoId) {
@@ -365,11 +370,12 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Rimuove l'associazione tra un collaboratore e un task.
+     * {@inheritDoc}
      *
      * @param todoId L'identificativo del task.
      * @param userId L'identificativo dell'utente da disassociare.
-     * @return {@code true} se la rimozione ha successo.
+     * @return {@code true} se la rimozione ha successo;
+     * {@code false} se l'associazione non viene trovata o in caso di errore SQL.
      */
     @Override
     public boolean leaveTodo(int todoId, int userId) {
@@ -388,11 +394,12 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Recupera l'intero oggetto ToDo tramite ID, unendo i dati con il proprietario.
-     * Utilizza nomi di colonne espliciti per la corretta gestione del ResultSet.
+     * {@inheritDoc}
+     * Unisce i dati provenienti dalla tabella principale e dalle tabelle correlate
+     * per restituire l'entità completa, includendo i collaboratori associati.
      *
      * @param todoId L'identificativo del task da cercare.
-     * @return L'oggetto ToDo popolato, o {@code null} se inesistente.
+     * @return L'oggetto ToDo popolato; {@code null} se il record è inesistente o in caso di errore SQL.
      */
     @Override
     public ToDo getTodoById(int todoId) {
@@ -435,14 +442,16 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Aggiorna esclusivamente l'indice di posizionamento visivo di un task,
-     * distinguendo tra la tabella principale e quella delle condivisioni.
+     * {@inheritDoc}
+     * Distingue la logica di aggiornamento tra la tabella principale (per i proprietari)
+     * e la tabella di legame (per i collaboratori) al fine di mantenere ordinamenti indipendenti.
      *
      * @param todoId      L'identificativo del task.
-     * @param newPosition Il nuovo numero d'ordine stabilito.
-     * @param role        Il ruolo dell'utente (OWNER o SHARED).
+     * @param newPosition Il nuovo numero d'ordine stabilito nell'interfaccia.
+     * @param role        Il ruolo dell'utente che esegue lo spostamento (OWNER o SHARED).
      * @param userId      L'ID dell'utente che sta effettuando lo spostamento.
-     * @return {@code true} se la query ha effetto, {@code false} altrimenti.
+     * @return {@code true} se l'aggiornamento ha effetto;
+     * {@code false} se il record non viene trovato o in caso di errore SQL.
      */
     @Override
     public boolean updatePosition(int todoId, int newPosition, String role, int userId) {
@@ -481,9 +490,10 @@ public class ToDoDAOImpl implements ToDoDAO {
     // ===================================================================================
 
     /**
-     * Interpreta la stringa della priorità dal database e la converte in Enum.
-     * @param priorityString Stringa proveniente dalla colonna del database.
-     * @return L'oggetto Priority corrispondente; ritorna {@code Priority.BASSA} come fallback se nullo o non valido.
+     * Interpreta la stringa testuale della priorità recuperata dal database e la converte nel corrispondente tipo enumerato.
+     *
+     * @param priorityString La stringa estratta dalla colonna del database.
+     * @return L'oggetto Priority corrispondente; restituisce {@code Priority.BASSA} come fallback di sicurezza se la stringa è nulla o non valida.
      */
     private Priority parsePriority(String priorityString) {
         if (priorityString == null) return Priority.BASSA;
@@ -496,11 +506,12 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Recupera i collaboratori di un task utilizzando una connessione già aperta.
+     * Recupera l'elenco dei collaboratori associati a uno specifico task riutilizzando una connessione SQL preesistente.
+     * Questo approccio evita l'apertura multipla di connessioni all'interno di cicli o transazioni.
      *
-     * @param todoId L'identificativo univoco del task.
-     * @param conn La connessione SQL attiva da utilizzare per l'interrogazione.
-     * @return Una lista di stringhe contenente gli username dei collaboratori associati.
+     * @param todoId L'identificativo univoco del task interrogato.
+     * @param conn La connessione al database attiva da utilizzare.
+     * @return Una lista di stringhe contenente gli username dei collaboratori associati. Restituisce una lista vuota in caso di errore o assenza di record.
      */
     private List<String> getCollaboratorsForTodo(int todoId, Connection conn) {
         List<String> collaborators = new ArrayList<>();
@@ -518,12 +529,13 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Inserisce un nuovo record ToDo nel database.
+     * Inserisce un nuovo record fisico nella tabella principale dei task (todos) recuperando l'identificativo chiave autogenerato.
+     * Metodo di supporto utilizzato internamente durante l'operazione transazionale di creazione.
      *
-     * @param conn La connessione SQL attiva.
-     * @param todo L'oggetto ToDo contenente i dati da persistere.
-     * @return L'identificativo (ID) generato dal database, oppure -1 in caso di fallimento dell'operazione.
-     * @throws SQLException Se si verifica un errore durante l'inserimento o il recupero delle chiavi generate.
+     * @param conn La connessione al database attiva che gestisce la transazione.
+     * @param todo L'oggetto ToDo contenente i dati grezzi da persistere.
+     * @return L'identificativo intero (ID) generato dal database per il nuovo record; restituisce {@code -1} se l'operazione fallisce o l'ID non è recuperabile.
+     * @throws SQLException Se si verifica un errore durante la preparazione dello statement o l'esecuzione dell'inserimento fisico.
      */
     private int insertTodoRecord(Connection conn, ToDo todo) throws SQLException {
         String sqlInsert = "INSERT INTO todos (board_id, title, description, expiry_date, priority, is_completed, url_link, image_path, background_color, position_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -549,11 +561,12 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Aggiorna i campi di base di un record ToDo esistente.
+     * Aggiorna fisicamente i campi informativi di un record ToDo già esistente nel database.
+     * Metodo di supporto utilizzato internamente durante l'operazione transazionale di modifica.
      *
-     * @param conn La connessione SQL attiva.
-     * @param todo L'oggetto ToDo con i dati aggiornati da salvare.
-     * @throws SQLException Se si verifica un errore durante l'esecuzione dell'UPDATE.
+     * @param conn La connessione al database attiva che gestisce la transazione.
+     * @param todo L'oggetto ToDo popolato con i dati aggiornati da sovrascrivere.
+     * @throws SQLException Se si verifica un errore durante la preparazione dello statement o l'esecuzione dell'aggiornamento.
      */
     private void updateTodoRecord(Connection conn, ToDo todo) throws SQLException {
         String sqlUpdate = "UPDATE todos SET title=?, description=?, expiry_date=?, priority=?, url_link=?, " +
@@ -573,12 +586,13 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Associa una lista di utenti come collaboratori di un determinato task.
+     * Associa fisicamente una lista di utenti come collaboratori di un task specifico, inserendo le relative chiavi nella tabella di legame.
+     * Sfrutta l'elaborazione batch per ottimizzare le prestazioni in caso di assegnazioni multiple.
      *
-     * @param conn          La connessione SQL attiva.
-     * @param todoId        L'identificativo del task a cui aggiungere collaboratori.
-     * @param collaborators La lista degli username degli utenti da associare.
-     * @throws SQLException Se si verifica un errore durante l'esecuzione del batch di inserimento.
+     * @param conn          La connessione al database attiva che gestisce la transazione.
+     * @param todoId        L'identificativo del task principale a cui collegare gli utenti.
+     * @param collaborators La lista degli username testuali da risolvere in ID e associare.
+     * @throws SQLException Se si verifica un errore durante l'esecuzione del batch di inserimento SQL.
      */
     private void assignCollaborators(Connection conn, int todoId, List<String> collaborators) throws SQLException {
         String sqlAssign = "INSERT INTO shared_todos (todo_id, user_id) SELECT ?, user_id FROM users WHERE username = ?";
@@ -593,11 +607,12 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Elimina tutte le associazioni di condivisione di un determinato task.
+     * Rimuove indiscriminatamente tutte le associazioni di condivisione di un task dalla tabella di legame.
+     * Tipicamente impiegato per resettare le condivisioni prima di reinserire una lista aggiornata.
      *
-     * @param conn   La connessione SQL attiva.
-     * @param todoId L'identificativo del task di cui rimuovere le condivisioni.
-     * @throws SQLException Se si verifica un errore durante l'esecuzione del DELETE.
+     * @param conn   La connessione al database attiva che gestisce la transazione.
+     * @param todoId L'identificativo del task di cui eliminare ogni traccia di collaborazione.
+     * @throws SQLException Se si verifica un errore durante l'esecuzione della direttiva di eliminazione.
      */
     private void clearCollaborators(Connection conn, int todoId) throws SQLException {
         String sqlDeleteCollabs = "DELETE FROM shared_todos WHERE todo_id=?";
@@ -608,9 +623,10 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Esegue il rollback in modo silenzioso sopprimendo eventuali eccezioni accessorie.
+     * Intercetta e gestisce l'annullamento di una transazione, sopprimendo loggando eventuali eccezioni secondarie
+     * per evitare l'occultamento dell'errore originale (Exception Masking).
      *
-     * @param conn La connessione SQL su cui annullare le operazioni pendenti.
+     * @param conn La connessione al database su cui invocare il rollback di emergenza.
      */
     private void rollbackSilently(Connection conn) {
         if (conn != null) {
@@ -623,9 +639,10 @@ public class ToDoDAOImpl implements ToDoDAO {
     }
 
     /**
-     * Ripristina la modalità AutoCommit al termine di una transazione.
+     * Ripristina la connessione al database al suo comportamento predefinito, riabilitando la conferma automatica delle istruzioni.
+     * Da invocare rigorosamente all'interno dei blocchi finally al termine di operazioni transazionali.
      *
-     * @param conn La connessione SQL su cui ripristinare il comportamento predefinito.
+     * @param conn La connessione al database da riconfigurare.
      */
     private void restoreAutoCommit(Connection conn) {
         if (conn != null) {

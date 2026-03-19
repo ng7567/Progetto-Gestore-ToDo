@@ -3,21 +3,30 @@ package model;
 import java.util.Objects;
 
 /**
- * Rappresenta un utente registrato nel sistema.
- * Gestisce le credenziali di accesso e l'identificativo univoco necessario per
- * stabilire le relazioni di possesso e condivisione con bacheche e task.
+ * Rappresenta un utente registrato nell'applicazione.
+ * Contiene le credenziali di accesso e il codice identificativo usato per
+ * collegare l'utente alle sue bacheche e ai suoi task.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class User {
+
+    /** Il codice numerico univoco assegnato all'utente dal database. */
     private int id;
+
+    /** Il nome scelto dall'utente per l'accesso. */
     private final String username;
+
+    /** La password dell'utente, salvata e gestita in formato hash per sicurezza. */
     private final String password;
 
     /**
-     * Costruisce un oggetto utente completo recuperato dalla base di dati.
+     * Crea un utente con tutti i dati letti dal database.
      *
-     * @param id       L'identificativo univoco assegnato dal database.
-     * @param username Il nome utente registrato.
-     * @param password La stringa rappresentante l'hash della password.
+     * @param id       Il codice univoco assegnato dal database.
+     * @param username Il nome utente.
+     * @param password La password dell'utente (in formato hash).
      */
     public User(int id, String username, String password) {
         this.id = id;
@@ -26,11 +35,11 @@ public class User {
     }
 
     /**
-     * Costruisce un oggetto utente parziale utilizzato durante la fase di registrazione.
-     * L'identificativo viene omesso poiché la sua generazione è delegata al database.
+     * Crea un nuovo utente durante la fase di registrazione.
+     * L'ID non serve perché viene generato in automatico dal database al momento del salvataggio.
      *
-     * @param username Il nome utente scelto per il nuovo account.
-     * @param password La password scelta dall'utente (gestita come hash dal sistema).
+     * @param username Il nome scelto per il nuovo account.
+     * @param password La password scelta per l'accesso (in formato hash).
      */
     public User(String username, String password) {
         this.username = username;
@@ -38,7 +47,7 @@ public class User {
     }
 
     /**
-     * Restituisce l'identificativo univoco dell'utente.
+     * Legge il codice univoco dell'utente.
      *
      * @return L'ID numerico dell'utente.
      */
@@ -47,38 +56,38 @@ public class User {
     }
 
     /**
-     * Imposta l'identificativo univoco dell'utente.
+     * Assegna il codice identificativo all'utente.
      *
-     * @param id L'ID assegnato dal sistema di persistenza.
+     * @param id L'ID numerico da impostare.
      */
     public void setId(int id) {
         this.id = id;
     }
 
     /**
-     * Restituisce il nome utente.
+     * Legge il nome utente.
      *
-     * @return La stringa contenente lo username.
+     * @return Il nome usato per l'accesso.
      */
     public String getUsername() {
         return username;
     }
 
     /**
-     * Restituisce la password (hash) dell'utente.
+     * Legge la password dell'utente.
      *
-     * @return La stringa contenente l'hash delle credenziali.
+     * @return La password salvata (in formato hash).
      */
     public String getPassword() {
         return password;
     }
 
     /**
-     * Fornisce una rappresentazione testuale dell'utente.
-     * Esclude intenzionalmente la password per garantire la sicurezza dei dati
-     * durante eventuali operazioni di log o debug.
+     * Restituisce una rappresentazione in formato testo dell'utente.
+     * La password viene nascosta di proposito per evitare di esporre
+     * dati sensibili se questo metodo viene usato nei log di sistema.
      *
-     * @return Una stringa riassuntiva contenente ID e username.
+     * @return Una stringa con l'ID e l'username dell'utente.
      */
     @Override
     public String toString() {
@@ -86,10 +95,10 @@ public class User {
     }
 
     /**
-     * Confronta l'istanza corrente con un altro oggetto per verificarne l'uguaglianza.
-     * La verifica è basata sulla combinazione di ID univoco e username.
+     * Confronta l'utente con un altro oggetto per capire se sono uguali.
+     * Due utenti sono uguali se hanno lo stesso ID e lo stesso username.
      *
-     * @param o L'oggetto da confrontare con l'utente corrente.
+     * @param o L'oggetto da confrontare.
      * @return {@code true} se rappresentano lo stesso utente, {@code false} altrimenti.
      */
     @Override
@@ -101,8 +110,8 @@ public class User {
     }
 
     /**
-     * Calcola il valore hash dell'utente.
-     * Utilizza l'ID e lo username come basi per la generazione del codice hash.
+     * Genera un codice numerico (hash) per l'utente,
+     * basandosi sul suo ID e sul suo username.
      *
      * @return Il valore hash calcolato.
      */

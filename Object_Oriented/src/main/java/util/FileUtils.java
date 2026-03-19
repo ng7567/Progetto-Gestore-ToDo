@@ -11,33 +11,40 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Classe di utilità per la gestione dei file fisici all'interno del progetto.
- * Centralizza le operazioni di salvataggio delle immagini caricate e la relativa
- * rimozione dal disco rigido.
- * Implementata con costruttore privato per impedirne l'istanziazione.
+ * Classe di utilità per la gestione dei file all'interno del progetto.
+ * Centralizza il salvataggio delle immagini allegate ai task e la loro
+ * successiva eliminazione dal disco.
+ * Ha un costruttore privato per vietarne la creazione di oggetti.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class FileUtils {
 
+    /** Logger per tracciare eventuali errori durante le operazioni sui file. */
     private static final Logger LOGGER = Logger.getLogger(FileUtils.class.getName());
 
-    // Cartella base dove salvare le immagini
+    /** Nome della cartella principale dove vengono salvate le immagini dell'applicazione. */
     private static final String STORAGE_DIR = "saved_images";
 
     /**
-     * Impedisce l'istanziazione esterna della classe tramite un costruttore privato.
-     * Lancia un'eccezione in caso di accesso tramite reflection.
+     * Costruttore privato.
+     * Lancia un'eccezione se viene richiamato per sbaglio (es. tramite reflection).
+     *
+     * @throws UnsupportedOperationException Sempre lanciata al richiamo.
      */
     private FileUtils() {
         throw new UnsupportedOperationException("Classe di utilità: istanziazione non consentita.");
     }
 
     /**
-     * Copia un file immagine dalla sorgente alla cartella di storage dell'applicazione.
-     * Genera un identificativo univoco (UUID) per il nome del file al fine di evitare
-     * collisioni tra file aventi il medesimo nome originale.
+     * Copia un file immagine dal computer dell'utente alla cartella di salvataggio dell'app.
+     * Genera in automatico un nome univoco (UUID) per il file copiato,
+     * in modo da evitare errori se due file originali hanno lo stesso nome.
      *
-     * @param originalPath Il percorso assoluto del file sorgente individuato nel filesystem dell'utente.
-     * @return Il percorso relativo del file salvato (es: "saved_images/uuid.jpg") o {@code null} in caso di errore.
+     * @param originalPath Il percorso assoluto del file originale da copiare.
+     * @return Il percorso del nuovo file salvato (es: "saved_images/uuid.jpg")
+     * oppure {@code null} se l'operazione fallisce.
      */
     public static String saveImage(String originalPath) {
         if (originalPath == null || originalPath.isEmpty()) {
@@ -45,28 +52,28 @@ public class FileUtils {
         }
 
         try {
-            // Verifica l'esistenza della directory di destinazione o tenta di crearla
+            // Controlla se la cartella di destinazione esiste, altrimenti la crea
             File directory = new File(STORAGE_DIR);
             if (!directory.exists() && !directory.mkdirs()) {
-                LOGGER.warning(() -> "Impossibile creare la cartella di storage: " + STORAGE_DIR);
+                LOGGER.warning(() -> "Impossibile creare la cartella di salvataggio: " + STORAGE_DIR);
                 return null;
             }
 
-            // Estrae l'estensione del file originale per preservare il formato
+            // Recupera l'estensione del file originale per mantenere il formato corretto (es. .jpg, .png)
             String extension = "";
             int i = originalPath.lastIndexOf('.');
             if (i > 0) {
                 extension = originalPath.substring(i);
             }
 
-            // Genera un nome file univoco tramite UUID
+            // Crea un nome file casuale e univoco
             String uniqueFileName = UUID.randomUUID() + extension;
 
-            // Definisce i riferimenti tramite le API NIO.2
+            // Prepara i percorsi usando le API moderne di Java (NIO.2)
             Path source = Paths.get(originalPath);
             Path destination = Paths.get(STORAGE_DIR, uniqueFileName);
 
-            // Esegue la copia fisica del file sovrascrivendo eventuali file esistenti
+            // Copia fisicamente il file, sovrascrivendo se necessario
             Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
 
             return destination.toString();
@@ -77,19 +84,18 @@ public class FileUtils {
     }
 
     /**
-     * Rimuove un file dal supporto di memorizzazione dato il suo percorso.
-     * Viene invocato tipicamente durante l'eliminazione di un task o la sostituzione di un'immagine.
-     * Utilizza le moderne API NIO in sostituzione del metodo legacy File.delete.
+     * Elimina un file dal disco partendo dal suo percorso.
+     * Viene usato di solito quando si elimina un task o si cambia l'immagine allegata.
      *
-     * @param pathStr Il percorso (relativo o assoluto) del file da eliminare.
-     * @return {@code true} se l'eliminazione avviene con successo, {@code false} altrimenti.
+     * @param pathStr Il percorso (relativo o assoluto) del file da cancellare.
+     * @return {@code true} se il file viene eliminato correttamente, {@code false} altrimenti.
      */
     public static boolean deleteFile(String pathStr) {
         if (pathStr == null || pathStr.trim().isEmpty()) {
             return false;
         }
 
-        // Converte in Path e risolve il percorso se relativo al progetto
+        // Converte la stringa in un oggetto Path e calcola il percorso completo se è relativo
         Path path = Paths.get(pathStr);
         if (!path.isAbsolute()) {
             path = Paths.get(System.getProperty("user.dir")).resolve(path);

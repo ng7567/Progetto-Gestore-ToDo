@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="31d05140-ea77-4e21-becf-19413f7925b3" name="Changes" comment="Aggiornamento Javadoc generale e fix cambio tema">
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/controller/class-use/Controller.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/controller/package-use.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/class-use/BoardDAO.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/class-use/ToDoDAO.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/class-use/UserDAO.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/class-use/BoardDAOImpl.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/class-use/ToDoDAOImpl.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/class-use/UserDAOImpl.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/package-use.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/package-use.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dto/class-use/TodoCreationDTO.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dto/package-use.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/class-use/BusinessLogicException.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/class-use/DuplicateBoardException.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/class-use/DuplicateCollaboratorException.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/class-use/InvalidCredentialsException.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/class-use/SelfSharingException.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/class-use/UnauthorizedAccessException.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/class-use/UserAlreadyExistsException.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/class-use/UserNotFoundException.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/package-use.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/class-use/AppHeader.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/class-use/AvatarIcon.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/class-use/TaskCard.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/class-use/ThemeSwitchIcon.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/class-use/ThemeToggleButton.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/package-use.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/class-use/AddTodoDialog.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/class-use/BoardDetailsDialog.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/class-use/RegisterDialog.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/class-use/TodoDetailsDialog.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/class-use/UserSearchDialog.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/package-use.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/events/class-use/TaskDragListener.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/events/package-use.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/class-use/BoardFrame.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/class-use/HomeFrame.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/class-use/LogInFrame.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/package-use.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/class-use/GuiUtils.DateTimePicker.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/class-use/GuiUtils.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/class-use/WrapLayout.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/package-use.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/main/class-use/Main.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/main/package-use.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/class-use/Board.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/class-use/Priority.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/class-use/ToDo.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/class-use/User.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/package-use.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/resource-files/glass.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/resource-files/left.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/resource-files/right.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/resource-files/x.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/class-use/DBConnection.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/class-use/FileUtils.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/class-use/SecurityUtils.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/package-use.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/Diagrammi/claas_diagram_package.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/Diagrammi/class_diagram_completo.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/allclasses-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/allclasses-index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/allpackages-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/allpackages-index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/controller/Controller.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/controller/Controller.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/controller/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/controller/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/controller/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/controller/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/BoardDAO.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/BoardDAO.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/ToDoDAO.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/ToDoDAO.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/UserDAO.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/UserDAO.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/BoardDAOImpl.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/BoardDAOImpl.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/ToDoDAOImpl.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/ToDoDAOImpl.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/UserDAOImpl.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/UserDAOImpl.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/impl/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dao/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dto/TodoCreationDTO.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dto/TodoCreationDTO.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dto/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dto/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dto/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/dto/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/BusinessLogicException.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/BusinessLogicException.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/DuplicateBoardException.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/DuplicateBoardException.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/DuplicateCollaboratorException.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/DuplicateCollaboratorException.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/InvalidCredentialsException.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/InvalidCredentialsException.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/SelfSharingException.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/SelfSharingException.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/UnauthorizedAccessException.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/UnauthorizedAccessException.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/UserAlreadyExistsException.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/UserAlreadyExistsException.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/UserNotFoundException.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/UserNotFoundException.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/exception/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/AppHeader.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/AppHeader.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/AvatarIcon.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/AvatarIcon.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/TaskCard.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/TaskCard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/ThemeSwitchIcon.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/ThemeSwitchIcon.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/ThemeToggleButton.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/ThemeToggleButton.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/components/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/AddTodoDialog.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/AddTodoDialog.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/BoardDetailsDialog.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/BoardDetailsDialog.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/RegisterDialog.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/RegisterDialog.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/TodoDetailsDialog.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/TodoDetailsDialog.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/UserSearchDialog.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/UserSearchDialog.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/dialogs/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/events/TaskDragListener.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/events/TaskDragListener.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/events/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/events/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/events/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/events/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/BoardFrame.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/BoardFrame.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/HomeFrame.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/HomeFrame.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/LogInFrame.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/LogInFrame.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/frames/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/GuiUtils.DateTimePicker.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/GuiUtils.DateTimePicker.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/GuiUtils.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/GuiUtils.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/WrapLayout.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/WrapLayout.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/gui/style/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/help-doc.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/help-doc.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-1.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-1.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-10.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-10.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-11.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-11.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-12.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-12.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-13.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-13.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-14.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-14.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-15.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-15.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-16.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-16.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-17.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-17.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-18.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-18.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-19.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-19.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-2.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-2.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-3.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-3.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-4.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-4.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-5.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-5.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-6.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-6.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-7.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-7.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-8.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-8.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-9.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index-files/index-9.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/legal/jqueryUI.md" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/legal/jqueryUI.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/main/Main.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/main/Main.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/main/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/main/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/main/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/main/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/member-search-index.js" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/member-search-index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/Board.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/Board.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/Priority.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/Priority.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/ToDo.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/ToDo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/User.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/User.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/model/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/overview-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/overview-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/overview-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/overview-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/package-search-index.js" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/package-search-index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/resource-files/glass.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/resource-files/jquery-ui.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/resource-files/jquery-ui.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/resource-files/link.svg" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/resource-files/link.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/resource-files/stylesheet.css" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/resource-files/stylesheet.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/resource-files/x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/script-files/jquery-ui.min.js" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/script-files/jquery-ui.min.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/script-files/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/script-files/script.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/script-files/search-page.js" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/script-files/search-page.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/script-files/search.js" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/script-files/search.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/search.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/search.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/serialized-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/serialized-form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/tag-search-index.js" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/tag-search-index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/type-search-index.js" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/type-search-index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/DBConnection.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/DBConnection.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/FileUtils.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/FileUtils.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/SecurityUtils.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/SecurityUtils.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/documentazione/javadoc/util/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/controller/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/controller/Controller.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/dao/BoardDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/dao/BoardDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/dao/ToDoDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/dao/ToDoDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/dao/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/dao/UserDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/dao/impl/BoardDAOImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/dao/impl/BoardDAOImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/dao/impl/ToDoDAOImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/dao/impl/ToDoDAOImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/dao/impl/UserDAOImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/dao/impl/UserDAOImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/dto/TodoCreationDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/dto/TodoCreationDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/BusinessLogicException.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/BusinessLogicException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/DuplicateBoardException.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/DuplicateBoardException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/DuplicateCollaboratorException.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/DuplicateCollaboratorException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/InvalidCredentialsException.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/InvalidCredentialsException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/SelfSharingException.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/SelfSharingException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/UnauthorizedAccessException.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/UnauthorizedAccessException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/UserAlreadyExistsException.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/UserAlreadyExistsException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/UserNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/exception/UserNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/components/AppHeader.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/components/AppHeader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/components/AvatarIcon.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/components/AvatarIcon.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/components/TaskCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/components/TaskCard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/components/ThemeSwitchIcon.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/components/ThemeSwitchIcon.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/components/ThemeToggleButton.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/components/ThemeToggleButton.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/dialogs/AddTodoDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/dialogs/AddTodoDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/dialogs/BoardDetailsDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/dialogs/BoardDetailsDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/dialogs/RegisterDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/dialogs/RegisterDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/dialogs/TodoDetailsDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/dialogs/TodoDetailsDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/dialogs/UserSearchDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/dialogs/UserSearchDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/events/TaskDragListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/events/TaskDragListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/frames/BoardFrame.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/frames/BoardFrame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/frames/HomeFrame.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/frames/HomeFrame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/frames/LogInFrame.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/frames/LogInFrame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/style/GuiUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/style/GuiUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/style/WrapLayout.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/gui/style/WrapLayout.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/main/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/model/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/model/Board.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/model/Priority.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/model/Priority.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/model/ToDo.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/model/ToDo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/model/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/util/DBConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/util/DBConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/util/FileUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/util/FileUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Object_Oriented/src/main/java/util/SecurityUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/Object_Oriented/src/main/java/util/SecurityUtils.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Interface" />
+        <option value="Class" />
+        <option value="Exception" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="38fOStXZIzoGJbjOd9jhar9i5Vm" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.LogInFrame.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.todo-app [package].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.todo-app [test].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/nunzi/Documents/Programmi/Università/Progetto - BDD POO/Object Oriented&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\nunzi\IdeaProjects\ToDo\src\icons\theme" />
+      <recent name="C:\Users\nunzi\IdeaProjects\ToDo\src\icons\password" />
+      <recent name="C:\Users\nunzi\IdeaProjects\ToDo\src\icons\app" />
+      <recent name="C:\Users\nunzi\IdeaProjects\ToDo\src\icons\user" />
+      <recent name="C:\Users\nunzi\IdeaProjects\ToDo\src\icons" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="main" />
+      <recent name="" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="Object Oriented" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.32098.37" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="31d05140-ea77-4e21-becf-19413f7925b3" name="Changes" comment="" />
+      <created>1769187163352</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1769187163352</updated>
+      <workItem from="1769187166491" duration="966000" />
+      <workItem from="1769188226151" duration="8252000" />
+      <workItem from="1769441831747" duration="4512000" />
+      <workItem from="1769532957740" duration="5750000" />
+      <workItem from="1769613072271" duration="10388000" />
+      <workItem from="1769697692589" duration="11108000" />
+      <workItem from="1769787997277" duration="16313000" />
+      <workItem from="1769870509013" duration="7543000" />
+      <workItem from="1770028638032" duration="9882000" />
+      <workItem from="1770112812434" duration="8384000" />
+      <workItem from="1770207394401" duration="12537000" />
+      <workItem from="1770317319056" duration="983000" />
+      <workItem from="1770388301182" duration="11049000" />
+      <workItem from="1770462093721" duration="21369000" />
+      <workItem from="1770576663414" duration="4588000" />
+      <workItem from="1770634430379" duration="34980000" />
+      <workItem from="1770728683144" duration="13683000" />
+      <workItem from="1770808395521" duration="1420000" />
+      <workItem from="1770813834223" duration="18815000" />
+      <workItem from="1770902368365" duration="17049000" />
+      <workItem from="1770991737569" duration="21913000" />
+      <workItem from="1771024324256" duration="762000" />
+      <workItem from="1771084721535" duration="4863000" />
+      <workItem from="1771244112972" duration="19379000" />
+      <workItem from="1771329074868" duration="26617000" />
+      <workItem from="1771417551639" duration="17270000" />
+      <workItem from="1771441317924" duration="11082000" />
+      <workItem from="1771511189180" duration="7416000" />
+      <workItem from="1771605079571" duration="11978000" />
+      <workItem from="1771776380422" duration="18918000" />
+      <workItem from="1771802576441" duration="187000" />
+      <workItem from="1771845407170" duration="19693000" />
+      <workItem from="1772028668287" duration="909000" />
+      <workItem from="1772039116402" duration="594000" />
+      <workItem from="1772202336483" duration="3107000" />
+      <workItem from="1772460918514" duration="3289000" />
+      <workItem from="1772552910058" duration="1638000" />
+      <workItem from="1772637032077" duration="3084000" />
+      <workItem from="1772815787202" duration="12866000" />
+      <workItem from="1772894345350" duration="7997000" />
+      <workItem from="1773067339367" duration="3401000" />
+      <workItem from="1773412529730" duration="23977000" />
+      <workItem from="1773497722705" duration="13594000" />
+      <workItem from="1773576864188" duration="2636000" />
+      <workItem from="1773591526077" duration="11921000" />
+      <workItem from="1773660146134" duration="6756000" />
+      <workItem from="1773693850689" duration="1524000" />
+      <workItem from="1773743552371" duration="3656000" />
+      <workItem from="1773748060323" duration="3000000" />
+      <workItem from="1773751456900" duration="10684000" />
+      <workItem from="1773789888286" duration="127000" />
+      <workItem from="1773856490731" duration="18117000" />
+      <workItem from="1773879614579" duration="256000" />
+      <workItem from="1773879881135" duration="325000" />
+      <workItem from="1773880257797" duration="111000" />
+      <workItem from="1773910150690" duration="5333000" />
+      <workItem from="1773917393554" duration="348000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Aggiornamento Javadoc generale e fix cambio tema" />
+    <option name="LAST_COMMIT_MESSAGE" value="Aggiornamento Javadoc generale e fix cambio tema" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.ClassCastException" package="java.lang" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="org.postgresql.util.PSQLException" package="org.postgresql.util" />
+          <option name="timeStamp" value="2" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

@@ -17,17 +17,29 @@ import java.util.logging.Logger;
  * Implementazione concreta dell'interfaccia BoardDAO.
  * Gestisce l'interazione diretta con la base di dati relazionale per tutte le operazioni
  * di persistenza relative alle entità di tipo Bacheca (Board).
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class BoardDAOImpl implements BoardDAO {
 
     private static final Logger LOGGER = Logger.getLogger(BoardDAOImpl.class.getName());
 
     /**
+     * Inizializza l'implementazione del Data Access Object per le bacheche.
+     */
+    public BoardDAOImpl() {
+        // Costruttore di default
+    }
+
+    /**
+     * {@inheritDoc}
      * Inserisce un nuovo record rappresentante una bacheca nel database,
      * associandolo in modo univoco all'utente specificato.
      *
      * @param board L'oggetto Board contenente i dati da persistere.
-     * @return {@code true} se l'inserimento nel database ha avuto successo, {@code false} altrimenti.
+     * @return {@code true} se l'inserimento nel database ha avuto successo;
+     * {@code false} se si verifica un errore durante l'esecuzione della query.
      */
     @Override
     public boolean createBoard(Board board) {
@@ -50,18 +62,18 @@ public class BoardDAOImpl implements BoardDAO {
     }
 
     /**
+     * {@inheritDoc}
      * Recupera la lista completa delle bacheche appartenenti a un determinato utente.
      * I risultati vengono estratti indicando esplicitamente le colonne necessarie
      * e sono ordinati in modo crescente in base all'identificativo della bacheca.
      *
      * @param userId L'identificativo univoco dell'utente proprietario.
-     * @return Una lista di oggetti Board associati all'utente. Ritorna una lista vuota in caso di errore.
+     * @return Una lista di oggetti Board associati all'utente. Restituisce una lista vuota (<b>mai null</b>) in caso di errore.
      */
     @Override
     public List<Board> getBoardsByUser(int userId) {
         List<Board> boards = new ArrayList<>();
 
-        // Sostituzione di SELECT * con i nomi espliciti delle colonne (SonarQube S6905)
         String sql = "SELECT board_id, title, description FROM BOARDS WHERE user_id = ? ORDER BY board_id ASC";
 
         try (Connection conn = DBConnection.getInstance().getConnection();
@@ -80,7 +92,6 @@ public class BoardDAOImpl implements BoardDAO {
             }
 
         } catch (SQLException e) {
-            // Utilizzo di Lambda Expression per differire la concatenazione della stringa (SonarQube S3457)
             LOGGER.log(Level.SEVERE, e, () -> "Errore durante il recupero delle Board per l'utente : " + userId);
         }
 
@@ -88,6 +99,7 @@ public class BoardDAOImpl implements BoardDAO {
     }
 
     /**
+     * {@inheritDoc}
      * Aggiorna il titolo e/o la descrizione di una bacheca esistente nel database.
      * L'eccezione SQL viene intenzionalmente propagata al livello superiore (Controller)
      * per consentire la corretta gestione di eventuali blocchi imposti dai trigger
@@ -95,7 +107,9 @@ public class BoardDAOImpl implements BoardDAO {
      *
      * @param boardId  L'identificativo univoco della bacheca da aggiornare.
      * @param newTitle Il nuovo titolo testuale da assegnare.
-     * @return {@code true} se l'aggiornamento del record ha successo, {@code false} se il record non esiste.
+     * @param newDescription La nuova descrizione testuale da assegnare.
+     * @return {@code true} se l'aggiornamento del record ha successo;
+     * {@code false} se il record non esiste.
      * @throws SQLException Se si verifica un errore SQL a livello di connessione o se un trigger blocca l'operazione.
      */
     @Override
@@ -116,12 +130,14 @@ public class BoardDAOImpl implements BoardDAO {
     }
 
     /**
+     * {@inheritDoc}
      * Rimuove definitivamente una bacheca dal database tramite il suo identificativo.
      * L'operazione presuppone che il database sia configurato con vincoli di tipo ON DELETE CASCADE,
-     * garantendo così la rimozione automatica e coerente di tutti i task (ToDo) associati.
+     * garantendo così la rimozione automatica e coerente di tutti i task associati.
      *
      * @param boardId L'identificativo univoco della bacheca da eliminare.
-     * @return {@code true} se l'eliminazione del record ha avuto successo, {@code false} altrimenti.
+     * @return {@code true} se l'eliminazione del record ha avuto successo;
+     * {@code false} se l'ID specificato non esiste o si verifica un errore.
      */
     @Override
     public boolean deleteBoard(int boardId) {
@@ -134,20 +150,21 @@ public class BoardDAOImpl implements BoardDAO {
             return pstmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            // Utilizzo di Lambda Expression per differire la concatenazione della stringa (SonarQube S3457)
             LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'eliminazione della Board ID: " + boardId);
             return false;
         }
     }
 
     /**
-     * Verifica la presenza di restrizioni (lock) che impediscono la modifica di una bacheca.
-     * Nello specifico, accerta se esistono task (ToDo) condivisi con l'utente corrente
+     * {@inheritDoc}
+     * Verifica la presenza di restrizioni che impediscono la modifica di una bacheca.
+     * Nello specifico, accerta se esistono task condivisi con l'utente corrente
      * situati all'interno di bacheche aventi il medesimo titolo di quella interrogata.
      *
      * @param boardTitle    Il titolo testuale della bacheca da sottoporre a verifica.
      * @param currentUserId L'identificativo dell'utente corrente (che opera come collaboratore).
-     * @return {@code true} se sono presenti task condivisi che inibiscono la modifica, {@code false} altrimenti.
+     * @return {@code true} se sono presenti task condivisi che inibiscono la modifica;
+     * {@code false} altrimenti.
      */
     @Override
     public boolean isBoardLocked(String boardTitle, int currentUserId) {
@@ -170,7 +187,6 @@ public class BoardDAOImpl implements BoardDAO {
             }
 
         } catch (SQLException e) {
-            // Utilizzo di Lambda Expression per differire la concatenazione della stringa (SonarQube S3457)
             LOGGER.log(Level.SEVERE, e, () -> "Errore durante il controllo del blocco per la Board: " + boardTitle);
         }
         return false;

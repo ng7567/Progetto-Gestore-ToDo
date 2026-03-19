@@ -9,24 +9,37 @@ import java.awt.*;
 import java.util.prefs.Preferences;
 
 /**
- * Finestra di login dell'applicazione.
- * Gestisce l'autenticazione dell'utente e il reindirizzamento alla dashboard principale.
- * Memorizza l'ultimo username utilizzato nelle preferenze locali.
+ * Rappresenta la finestra di accesso (Login) dell'applicazione.
+ * Coordina le procedure di autenticazione dell'utente, gestisce la convalida delle
+ * credenziali tramite il controller e abilita il reindirizzamento verso la dashboard principale.
+ * Implementa inoltre un meccanismo di persistenza locale tramite le API {@link Preferences}
+ * per memorizzare l'ultimo username utilizzato, ottimizzando l'esperienza di accesso successiva.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class LogInFrame extends JFrame {
 
+    /** Il riferimento al gestore della logica di business per le operazioni di autenticazione. */
     private final transient Controller controller;
+
+    /** Il nodo delle preferenze utente per la memorizzazione dei dati di configurazione locale. */
     private final transient Preferences prefs;
+
+    /** La chiave identificativa utilizzata per salvare e recuperare l'ultimo username nel registro di sistema. */
     private static final String PREF_LAST_USER = "last_username";
 
-    // Componenti grafici
+    /** Il campo di input testuale per l'immissione dell'username. */
     private JTextField txtUsername;
+
+    /** Il campo di input protetto per l'immissione della password. */
     private JPasswordField txtPassword;
 
     /**
-     * Costruisce la finestra di login.
+     * Inizializza la finestra di login configurando il legame con il controller e
+     * ripristinando le preferenze utente precedentemente salvate.
      *
-     * @param controller Il controller per la gestione della logica di autenticazione.
+     * @param controller Il riferimento al Controller per l'inoltro delle richieste di accesso.
      */
     public LogInFrame(Controller controller) {
         super("ToDo App - Login");
@@ -35,59 +48,58 @@ public class LogInFrame extends JFrame {
 
         initUI();
 
-        // Impostazioni base della finestra
+        // Configurazione delle proprietà strutturali della finestra
         GuiUtils.setAppIcon(this);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(400, 450); // Leggermente più alta per spaziatura migliore
+        setSize(400, 450);
         setLocationRelativeTo(null);
         setResizable(false);
     }
 
     /**
-     * Inizializza l'interfaccia utente della schermata di accesso.
-     * Configura il layout {@code GridBagLayout} per centrare i componenti, predispone
-     * i campi di input per le credenziali (incluso il recupero dell'ultimo username)
-     * e definisce la gerarchia visiva dei pulsanti di azione.
+     * Struttura gerarchicamente l'interfaccia utente della schermata di accesso.
+     * Impiega un layout a griglia ({@link GridBagLayout}) per assicurare il centraggio
+     * dei componenti e predispone i moduli di input, integrando il valore di default
+     * recuperato dalle impostazioni locali per l'username.
      */
     private void initUI() {
-        // Pannello principale con colore di sfondo
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBackground(GuiUtils.getBackgroundColor());
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 20, 10, 20); // Margini laterali più ampi
+        gbc.insets = new Insets(10, 20, 10, 20);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // --- TITOLO ---
+        // --- Sezione Titolo ---
         JLabel lblTitle = new JLabel("BENTORNATO", SwingConstants.CENTER);
         lblTitle.setFont(GuiUtils.FONT_TITLE);
         lblTitle.setForeground(GuiUtils.getTextColor());
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2; // Occupa tutta la larghezza
-        gbc.insets = new Insets(20, 20, 30, 20); // Più spazio sotto il titolo
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(20, 20, 30, 20);
         mainPanel.add(lblTitle, gbc);
 
-        // Reset constraints per i campi
+        // Reset dei vincoli per i campi di input
         gbc.insets = new Insets(5, 20, 5, 20);
-        gbc.gridwidth = 2; // I campi occupano tutta la larghezza per design più pulito
+        gbc.gridwidth = 2;
 
-        // --- USERNAME ---
+        // --- Sezione Username ---
         gbc.gridy++;
         JLabel lblUser = GuiUtils.createLabel("Username");
         mainPanel.add(lblUser, gbc);
 
         gbc.gridy++;
         txtUsername = GuiUtils.createStandardTextField(15);
-        // Recupera l'ultimo utente salvato
+        // Ripristino dell'ultimo username salvato nel registro locale
         String lastUser = prefs.get(PREF_LAST_USER, "");
         txtUsername.setText(lastUser);
         mainPanel.add(txtUsername, gbc);
 
-        // --- PASSWORD ---
+        // --- Sezione Password ---
         gbc.gridy++;
-        gbc.insets = new Insets(15, 20, 5, 20); // Spazio extra sopra la label password
+        gbc.insets = new Insets(15, 20, 5, 20);
         JLabel lblPass = GuiUtils.createLabel("Password");
         mainPanel.add(lblPass, gbc);
 
@@ -97,34 +109,31 @@ public class LogInFrame extends JFrame {
         JPanel passwordPanel = GuiUtils.createPasswordPanelWithEye(txtPassword);
         mainPanel.add(passwordPanel, gbc);
 
-        // --- BOTTONE LOGIN ---
+        // --- Sezione Azioni ---
         gbc.gridy++;
-        gbc.insets = new Insets(30, 20, 10, 20); // Spazio prima del bottone
+        gbc.insets = new Insets(30, 20, 10, 20);
         JButton btnLogin = new JButton("Accedi");
         GuiUtils.stylePrimaryButton(btnLogin);
-        // Evento Login
         btnLogin.addActionListener(e -> performLogin());
         mainPanel.add(btnLogin, gbc);
 
-        // --- BOTTONE REGISTRAZIONE ---
         gbc.gridy++;
         gbc.insets = new Insets(5, 20, 20, 20);
         JButton btnRegister = new JButton("Non hai un account? Registrati");
         GuiUtils.styleLinkButton(btnRegister);
-        // Evento Registrazione
         btnRegister.addActionListener(e -> openRegisterDialog());
         mainPanel.add(btnRegister, gbc);
 
         add(mainPanel);
 
-        // Imposta il tasto Invio per attivare il login
+        // Vincola il tasto Invio all'esecuzione del tentativo di login
         this.getRootPane().setDefaultButton(btnLogin);
     }
 
     /**
-     * Apre il dialogo modale dedicato alla registrazione di un nuovo profilo utente.
-     * Passa il riferimento della finestra attuale come proprietaria per garantire
-     * il corretto posizionamento del dialog.
+     * Innesca l'apertura del dialog dedicato alla registrazione.
+     * Utilizza l'istanza corrente come finestra proprietaria per mantenere
+     * il vincolo di gerarchia visiva.
      */
     private void openRegisterDialog() {
         RegisterDialog dialog = new RegisterDialog(this, controller);
@@ -132,10 +141,12 @@ public class LogInFrame extends JFrame {
     }
 
     /**
-     * Esegue la procedura logica per l'autenticazione dell'utente nel sistema.
-     * Recupera le credenziali dai campi di input, le valida formalmente e le inoltra
-     * al controller. In caso di successo, memorizza l'username nelle preferenze locali
-     * e avvia la transizione verso la dashboard principale (HomeFrame).
+     * Gestisce la procedura logica per l'autenticazione del profilo.
+     * Esegue l'estrazione e la normalizzazione dei dati di input, demanda al controller
+     * l'interrogazione del database e, in caso di esito positivo, provvede al salvataggio
+     * persistente dell'username e alla transizione verso la schermata principale ({@link HomeFrame}).
+     * Implementa una gestione delle eccezioni per isolare errori di credenziali
+     * da anomalie tecniche di rete o database.
      */
     private void performLogin() {
         String user = txtUsername.getText().trim();
@@ -150,16 +161,16 @@ public class LogInFrame extends JFrame {
         }
 
         try {
-            // Tenta il login: se le credenziali sono errate, viene lanciata l'eccezione
+            // Inoltro della richiesta di autenticazione al livello di business
             controller.login(user, pass);
 
-            // Se arriva qui, il login è riuscito
+            // Consolidamento dell'username nelle preferenze locali al successo dell'operazione
             prefs.put(PREF_LAST_USER, user);
             this.dispose();
             new HomeFrame(controller).setVisible(true);
 
         } catch (exception.InvalidCredentialsException ex) {
-            // Mostra il messaggio specifico definito nell'eccezione
+            // Intercettazione di credenziali errate o utente inesistente
             JOptionPane.showMessageDialog(
                     this,
                     ex.getMessage(),
@@ -167,7 +178,7 @@ public class LogInFrame extends JFrame {
                     JOptionPane.WARNING_MESSAGE
             );
         } catch (java.sql.SQLException ex) {
-            // Gestione dell'errore tecnico del database
+            // Gestione di interruzioni di connettività con il server PostgreSQL
             JOptionPane.showMessageDialog(
                     this,
                     "Errore di connessione al database. Riprova più tardi.",
@@ -175,7 +186,7 @@ public class LogInFrame extends JFrame {
                     JOptionPane.ERROR_MESSAGE
             );
         } catch (Exception ex) {
-            // Errori imprevisti
+            // Paracadute per eccezioni runtime non catalogate
             JOptionPane.showMessageDialog(
                     this,
                     "Si è verificato un errore inaspettato durante l'accesso.",

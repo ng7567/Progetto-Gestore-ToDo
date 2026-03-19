@@ -9,6 +9,10 @@ import java.util.List;
  * Interfaccia che definisce le operazioni di accesso ai dati per le bacheche (Board).
  * Gestisce la creazione, lettura, aggiornamento ed eliminazione delle bacheche,
  * inclusi i controlli specifici per le logiche di condivisione.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
+ * @see dao.impl.BoardDAOImpl
  */
 public interface BoardDAO {
 
@@ -16,7 +20,8 @@ public interface BoardDAO {
      * Inserisce una nuova bacheca nel database.
      *
      * @param board L'oggetto {@link Board} contenente i dati da persistere.
-     * @return {@code true} se l'inserimento ha successo, {@code false} altrimenti.
+     * @return {@code true} se l'inserimento è avvenuto con successo nel database;
+     * {@code false} se l'operazione è fallita (es. errore tecnico o validazione dati non superata).
      */
     boolean createBoard(Board board);
 
@@ -25,7 +30,7 @@ public interface BoardDAO {
      *
      * @param userId L'identificativo univoco dell'utente.
      * @return Una lista di oggetti {@link Board} appartenenti all'utente specificato.
-     * Se l'utente non possiede bacheche, restituisce una lista vuota (non null).
+     * Se l'utente non possiede bacheche, restituisce una lista vuota (<b>mai null</b>).
      */
     List<Board> getBoardsByUser(int userId);
 
@@ -46,7 +51,8 @@ public interface BoardDAO {
      * Grazie ai vincoli CASCADE del database, eliminerà automaticamente anche tutti i task in essa contenuti.
      *
      * @param boardId L'identificativo della bacheca da eliminare.
-     * @return {@code true} se l'eliminazione ha successo, {@code false} altrimenti.
+     * @return {@code true} se la bacheca è stata eliminata correttamente;
+     * {@code false} se nessun record è stato trovato con l'ID specificato.
      */
     boolean deleteBoard(int boardId);
 

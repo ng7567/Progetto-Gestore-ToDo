@@ -9,28 +9,44 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 /**
- * Componente grafico che rappresenta l'intestazione (Header) dell'applicazione.
- * Contiene il titolo, il pulsante indietro, il link per i dettagli (se applicabile),
- * lo switch del tema e il menu utente.
+ * Rappresenta il componente grafico dell'intestazione (Header) dell'applicazione.
+ * Costituisce la barra di navigazione superiore, ospitando il titolo della vista corrente,
+ * i controlli di navigazione (tasto indietro), l'interruttore per il tema visivo e
+ * il menu contestuale legato al profilo dell'utente autenticato.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class AppHeader extends JPanel {
 
+    /** Il titolo testuale visualizzato al centro dell'intestazione. */
     private final String title;
+
+    /** L'azione di callback da eseguire alla pressione del pulsante di ritorno. */
     private final transient Runnable onBack;
+
+    /** L'azione di callback per ricaricare dinamicamente il tema grafico (Light/Dark mode). */
     private final transient Runnable onReloadTheme;
+
+    /** Il riferimento al Controller principale per la gestione della logica di business (es. logout). */
     private final transient Controller controller;
+
+    /** Il riferimento al frame genitore, necessario per l'ancoraggio e il posizionamento dei dialoghi. */
     private final JFrame parentFrame;
-    private final transient Runnable onOpenDetails; // Callback per aprire i dettagli
+
+    /** L'azione di callback opzionale invocata al click sul collegamento dei dettagli. */
+    private final transient Runnable onOpenDetails;
 
     /**
-     * Costruttore completo per le schermate che richiedono funzionalità di dettaglio (es. BoardFrame).
+     * Inizializza l'intestazione completa, includendo il collegamento interattivo per i dettagli.
+     * Utilizzato tipicamente nelle schermate che richiedono opzioni aggiuntive (come la vista della singola bacheca).
      *
-     * @param title         Il titolo iniziale.
-     * @param onBack        Azione da eseguire al click del tasto indietro.
-     * @param onReloadTheme Azione per ricaricare il tema.
-     * @param controller    Riferimento al controller applicativo.
-     * @param parentFrame   Il frame genitore (per i dialoghi).
-     * @param onOpenDetails Azione da eseguire quando si clicca su "Dettagli".
+     * @param title         Il titolo testuale della schermata corrente.
+     * @param onBack        La funzione di callback per la navigazione a ritroso (può essere {@code null} se disabilitata).
+     * @param onReloadTheme La funzione di callback per l'aggiornamento del tema visivo.
+     * @param controller    Il riferimento al gestore della logica di business.
+     * @param parentFrame   Il frame grafico contenitore, utile per ancorare i popup.
+     * @param onOpenDetails La funzione di callback attivata dalla pressione del pulsante "Dettagli bacheca".
      */
     public AppHeader(String title, Runnable onBack, Runnable onReloadTheme, Controller controller, JFrame parentFrame, Runnable onOpenDetails) {
         this.title = title;
@@ -44,20 +60,23 @@ public class AppHeader extends JPanel {
     }
 
     /**
-     * Costruttore semplificato per le schermate senza dettagli (es. HomeFrame).
+     * Inizializza l'intestazione in modalità semplificata, omettendo il pulsante dei dettagli.
+     * Utilizzato nelle schermate di navigazione principale (come la Home) in cui non sono richieste azioni secondarie.
      *
-     * @param title         Il titolo iniziale.
-     * @param onBack        Azione da eseguire al click del tasto indietro.
-     * @param onReloadTheme Azione per ricaricare il tema.
-     * @param controller    Riferimento al controller applicativo.
-     * @param parentFrame   Il frame genitore.
+     * @param title         Il titolo testuale della schermata corrente.
+     * @param onBack        La funzione di callback per la navigazione a ritroso.
+     * @param onReloadTheme La funzione di callback per l'aggiornamento del tema visivo.
+     * @param controller    Il riferimento al gestore della logica di business.
+     * @param parentFrame   Il frame grafico contenitore.
      */
     public AppHeader(String title, Runnable onBack, Runnable onReloadTheme, Controller controller, JFrame parentFrame) {
         this(title, onBack, onReloadTheme, controller, parentFrame, null);
     }
 
     /**
-     * Inizializza e dispone tutti i componenti grafici dell'header.
+     * Struttura e posiziona tutti i componenti grafici all'interno dell'intestazione.
+     * Applica un layout a griglia ({@link GridBagLayout}) suddividendo lo spazio in tre sezioni logiche:
+     * area di navigazione (sinistra), area informativa (centro) e area utente (destra).
      */
     private void initUI() {
         setLayout(new GridBagLayout());
@@ -164,12 +183,12 @@ public class AppHeader extends JPanel {
     }
 
     /**
-     * Crea e configura il menu popup relativo al profilo dell'utente.
-     * Inserisce un'intestazione non cliccabile con il nome utente e un'opzione
-     * per eseguire il logout.
+     * Costruisce e configura il menu a tendina contestuale per l'avatar dell'utente.
+     * Inserisce un'intestazione informativa non cliccabile seguita dall'azione di disconnessione (Logout),
+     * gestendo il ciclo di vita della sessione e il reindirizzamento alla schermata di accesso.
      *
-     * @param username Il nome dell'utente attualmente autenticato da visualizzare nel menu.
-     * @return L'oggetto {@code JPopupMenu} configurato con le voci di profilo e logout.
+     * @param username Il nome dell'utente attualmente autenticato da mostrare come intestazione del menu.
+     * @return L'oggetto {@link JPopupMenu} configurato e pronto per essere visualizzato.
      */
     private JPopupMenu createProfilePopupMenu(String username) {
         JPopupMenu popupMenu = new JPopupMenu();

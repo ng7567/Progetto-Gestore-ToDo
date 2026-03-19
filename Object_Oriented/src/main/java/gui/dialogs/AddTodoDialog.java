@@ -21,44 +21,80 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Finestra di dialogo modale per la creazione di un nuovo Task (ToDo).
- * Permette di inserire titolo, descrizione e opzioni avanzate come scadenza,
- * priorità, collaboratori e allegati.
+ * Rappresenta la finestra di dialogo modale adibita alla creazione di un nuovo Task (ToDo).
+ * Fornisce un'interfaccia utente strutturata a comparsa progressiva, permettendo l'inserimento
+ * dei metadati di base (titolo, descrizione) e offrendo un pannello espandibile per la
+ * configurazione delle opzioni avanzate (scadenza temporale, priorità, collaboratori,
+ * allegati multimediali e colore di sfondo personalizzato).
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class AddTodoDialog extends JDialog {
 
+    /** Il riferimento al gestore della logica applicativa per le operazioni di persistenza. */
     private final transient Controller controller;
+
+    /** L'identificativo univoco della bacheca genitrice alla quale associare il nuovo task. */
     private final int boardId;
+
+    /** Flag di stato che indica se l'operazione di salvataggio nel database si è conclusa con esito positivo. */
     private boolean success = false;
 
+    /** Stringa costante utilizzata come titolo predefinito per i popup di avviso (Warning). */
     private static final String WARNING = "Attenzione";
 
-    // Componenti UI principali
+    // --- Componenti UI Principali ---
+
+    /** Il campo di testo a riga singola per l'inserimento del titolo obbligatorio del task. */
     private JTextField txtTitle;
+
+    /** L'area di testo multi-riga per l'inserimento della descrizione opzionale del task. */
     private JTextArea txtDescription;
+
+    /** Il menu a tendina per la selezione del livello di priorità (enum {@link Priority}). */
     private JComboBox<Priority> comboPriority;
 
-    // Componenti Data e Ora
+    // --- Componenti Data e Ora ---
+
+    /** Il componente grafico a calendario per la selezione visuale della data di scadenza. */
     private JDateChooser dateChooser;
+
+    /** Il selettore numerico a rotazione per l'impostazione dell'orario (ore e minuti) della scadenza. */
     private JSpinner timeSpinner;
 
-    // Componenti Pannello Avanzato
+    // --- Componenti Pannello Avanzato ---
+
+    /** Il contenitore grafico espandibile/collassabile che ospita le opzioni di configurazione secondarie. */
     private JPanel panelAdvanced;
+
+    /** Il pulsante interattivo delegato all'alternanza della visibilità del pannello avanzato. */
     private JButton btnToggleAdvanced;
+
+    /** Il campo di testo per l'inserimento di un URL di collegamento ipertestuale opzionale. */
     private JTextField txtLink;
+
+    /** Il campo di testo (in sola lettura) che mostra il percorso nel file system dell'immagine allegata. */
     private JTextField txtImagePath;
+
+    /** L'oggetto Color che memorizza la tinta di sfondo personalizzata scelta dall'utente (null se non specificata). */
     private Color selectedBackgroundColor = null;
 
-    // Gestione Collaboratori
+    // --- Gestione Collaboratori ---
+
+    /** Il modello dati sottostante che gestisce l'elenco in tempo reale degli username associati come collaboratori. */
     private DefaultListModel<String> collaboratorsModel;
+
+    /** Il componente visuale a lista che espone graficamente gli elementi contenuti nel {@code collaboratorsModel}. */
     private JList<String> listCollaborators;
 
     /**
-     * Costruisce il dialogo per la creazione di un nuovo task.
+     * Inizializza la finestra di dialogo modale, bloccando l'interazione con la finestra
+     * chiamante fino alla conclusione del processo di creazione o all'annullamento.
      *
-     * @param owner      La finestra proprietaria.
-     * @param controller Il controller per la logica di business.
-     * @param boardId    L'ID della bacheca in cui inserire il task.
+     * @param owner      La finestra grafica proprietaria (genitore) da cui scaturisce il dialogo.
+     * @param controller Il riferimento al Controller per l'inoltro delle richieste di business.
+     * @param boardId    L'identificativo relazionale della bacheca di destinazione.
      */
     public AddTodoDialog(Window owner, Controller controller, int boardId) {
         super(owner, "Nuova task", ModalityType.APPLICATION_MODAL);
@@ -73,9 +109,9 @@ public class AddTodoDialog extends JDialog {
     }
 
     /**
-     * Inizializza l'interfaccia utente principale della finestra di dialogo.
-     * Configura il layout {@code GridBagLayout} per organizzare i campi di input
-     * e imposta gli stili grafici standard tramite le utilità di sistema.
+     * Struttura gerarchicamente l'interfaccia utente primaria della finestra di dialogo.
+     * Applica un layout flessibile a griglia ({@link GridBagLayout}) per posizionare
+     * i campi di input essenziali e aggancia i listener ai pulsanti di azione (Salva/Annulla).
      */
     private void initUI() {
         JPanel panel = new JPanel(new GridBagLayout());
@@ -187,10 +223,11 @@ public class AddTodoDialog extends JDialog {
     }
 
     /**
-     * Crea e configura il pannello contenente il DateChooser e lo Spinner per l'ora.
-     * Estrae i riferimenti ai componenti interni per permetterne l'accesso durante il salvataggio.
+     * Istanzia e configura il sottomodulo temporale delegato alla cattura della data e dell'orario.
+     * Estrae e memorizza i riferimenti interni al {@code JDateChooser} e al {@code JSpinner}
+     * per consentirne l'interrogazione successiva durante la fase di salvataggio.
      *
-     * @return Un oggetto {@code JPanel} contenente i selettori di data e ora sincronizzati.
+     * @return L'oggetto {@code JPanel} aggregato pronto per l'inserimento nel layout principale.
      */
     private JPanel createDatePanel() {
         GuiUtils.DateTimePicker picker = GuiUtils.createDateTimePicker(null);
@@ -200,11 +237,12 @@ public class AddTodoDialog extends JDialog {
     }
 
     /**
-     * Inizializza i componenti del pannello avanzato del dialogo.
-     * Configura i campi per l'inserimento di URL, la selezione del colore di sfondo,
-     * la gestione degli allegati multimediali e l'aggiunta di collaboratori.
+     * Struttura i componenti funzionali incapsulati all'interno del pannello avanzato.
+     * Configura i moduli per la selezione interattiva del colore (tramite {@link JColorChooser}),
+     * il caricamento degli allegati multimediali (tramite {@link JFileChooser}) e la gestione
+     * dinamica della lista dei collaboratori.
      *
-     * @param p Il pannello contenitore in cui inserire i componenti avanzati.
+     * @param p Il pannello contenitore di destinazione in cui iniettare i controlli avanzati.
      */
     private void initAdvancedPanel(JPanel p) {
         GridBagConstraints g = new GridBagConstraints();
@@ -318,8 +356,9 @@ public class AddTodoDialog extends JDialog {
     }
 
     /**
-     * Apre la finestra di dialogo per la ricerca e la selezione di utenti nel sistema.
-     * Aggiunge l'utente selezionato alla lista dei collaboratori se non già presente.
+     * Innesca la comparsa del dialogo modale di ricerca e selezione degli utenti.
+     * Intercetta la risposta e, previe verifiche di univocità, immette la selezione
+     * nel modello dati dei collaboratori, aggiornando in tempo reale la visualizzazione.
      */
     private void openUserSearchDialog() {
         UserSearchDialog searchDialog = new UserSearchDialog(this, controller);
@@ -337,8 +376,9 @@ public class AddTodoDialog extends JDialog {
     }
 
     /**
-     * Alterna la visibilità del pannello contenente le opzioni avanzate.
-     * Aggiorna il testo dell'etichetta del pulsante e ridimensiona la finestra di dialogo.
+     * Alterna la visibilità del blocco delle opzioni avanzate (Toggle behavior).
+     * Modifica contestualmente il testo dell'etichetta direzionale sul pulsante e invoca
+     * la ricalibrazione del layout ({@code pack()}) per adattare le dimensioni della finestra.
      */
     private void toggleAdvancedOptions() {
         boolean isVisible = panelAdvanced.isVisible();
@@ -353,9 +393,10 @@ public class AddTodoDialog extends JDialog {
     }
 
     /**
-     * Esegue la procedura di salvataggio del nuovo task.
-     * Raccoglie i dati inseriti, convalida la scadenza e il titolo, gestisce il trasferimento
-     * fisico dei file multimediali e comunica con il controller per la persistenza.
+     * Coordina il flusso transazionale per il consolidamento dei dati immessi in un nuovo record.
+     * Esegue le procedure di validazione preventiva sull'input, compone il payload tramite
+     * il pattern DTO ({@link TodoCreationDTO}), intercetta le eccezioni di business logic
+     * (es. vincoli di auto-condivisione) e ordina al controller la persistenza dei dati.
      */
     private void saveTodo() {
         String title = txtTitle.getText().trim();
@@ -434,12 +475,13 @@ public class AddTodoDialog extends JDialog {
     }
 
     /**
-     * Combina la data selezionata con l'orario dello spinner per creare un Timestamp SQL.
-     * Se l'orario non è specificato, imposta come default l'ultimo minuto del giorno (23:59).
+     * Sincronizza il giorno selezionato con le componenti orarie scelte nello spinner per
+     * forgiare un indicatore temporale compatibile con lo standard SQL. In assenza di specifica
+     * oraria, ripiega sull'ultimo istante utile della giornata selezionata (23:59:00).
      *
-     * @param date La data (giorno/mese/anno) selezionata dall'utente.
-     * @param time L'oggetto Date contenente le informazioni su ore e minuti dallo spinner.
-     * @return Il {@code Timestamp} risultante dalla combinazione, o {@code null} se la data è nulla.
+     * @param date L'entità {@code Date} rappresentante le frazioni spaziali anno/mese/giorno.
+     * @param time L'entità {@code Date} deputata al trasporto delle frazioni temporali ore/minuti.
+     * @return L'oggetto {@link Timestamp} processato per la query, o {@code null} se il giorno non è specificato.
      */
     private Timestamp getCombinedTimestamp(Date date, Date time) {
         if (date == null) return null;
@@ -453,28 +495,31 @@ public class AddTodoDialog extends JDialog {
             calDate.set(Calendar.HOUR_OF_DAY, calTime.get(Calendar.HOUR_OF_DAY));
             calDate.set(Calendar.MINUTE, calTime.get(Calendar.MINUTE));
         } else {
-            // Default sicurezza
+            // Default sicurezza: fine della giornata
             calDate.set(Calendar.HOUR_OF_DAY, 23);
             calDate.set(Calendar.MINUTE, 59);
         }
 
         calDate.set(Calendar.SECOND, 0);
+        calDate.set(Calendar.MILLISECOND, 0); // Azzera i millisecondi per evitare incongruenze DB
         return new Timestamp(calDate.getTimeInMillis());
     }
 
     /**
-     * Indica se l'operazione di creazione del task si è conclusa con successo.
+     * Interroga lo stato conclusivo del ciclo di vita del dialogo.
+     * Utile al frame chiamante per determinare se è necessario innescare un aggiornamento visivo (refresh).
      *
-     * @return {@code true} se il task è stato salvato correttamente nel database, {@code false} altrimenti.
+     * @return {@code true} se la catena di persistenza nel database si è conclusa senza anomalie; {@code false} altrimenti.
      */
     public boolean isSuccess() {
         return success;
     }
 
     /**
-     * Recupera la finestra principale (Window) che funge da antenato per il dialogo.
+     * Recupera l'astrazione Window genitore al vertice dell'albero gerarchico grafico.
+     * Per garantire la corretta interruzione logica modale dei sottomenù d'avviso.
      *
-     * @return L'oggetto {@code Window} gerarchicamente superiore a questo dialogo.
+     * @return L'entità {@link Window} superiore, o {@code null} se il frame risulta svincolato.
      */
     private Window getBaseFrame() {
         return SwingUtilities.getWindowAncestor(this);

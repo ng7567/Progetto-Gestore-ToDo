@@ -4,47 +4,58 @@ import java.awt.*;
 import javax.swing.*;
 
 /**
- * Estensione di {@link FlowLayout} che permette ai componenti di andare a capo
- * automaticamente quando lo spazio orizzontale è esaurito.
+ * Rappresenta un'estensione specializzata di {@link FlowLayout} progettata per consentire
+ * ai componenti di disporsi su più righe qualora lo spazio orizzontale
+ * del contenitore risulti esaurito.
  * <p>
- * È particolarmente utile quando il contenitore è inserito in uno {@link JScrollPane},
- * poiché il FlowLayout standard tenderebbe a espandersi infinitamente in orizzontale.
+ * Risolve la criticità del {@code FlowLayout} standard all'interno di uno {@link JScrollPane},
+ * dove il layout originale tenderebbe a espandersi infinitamente in orizzontale.
+ * Questa implementazione calcola dinamicamente l'altezza necessaria in base alla larghezza
+ * attuale, garantendo una visualizzazione a griglia fluida e responsiva.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class WrapLayout extends FlowLayout {
 
     /**
-     * Costruisce un WrapLayout con allineamento a sinistra e gap predefiniti.
+     * Inizializza un nuovo {@code WrapLayout} con allineamento a sinistra e spaziature
+     * orizzontali e verticali predefinite di 5 pixel.
      */
     public WrapLayout() {
         super();
     }
 
     /**
-     * Costruisce un WrapLayout con l'allineamento specificato e gap di 5 pixel.
-     * @param align l'allineamento (es. {@code FlowLayout.LEFT})
+     * Inizializza un nuovo {@code WrapLayout} applicando l'allineamento specificato
+     * e mantenendo le spaziature predefinite di 5 pixel.
+     *
+     * @param align Il valore di allineamento desiderato (es. {@link FlowLayout#LEFT}).
      */
     public WrapLayout(int align) {
         super(align);
     }
 
     /**
-     * Costruisce un WrapLayout con allineamento e spaziature specificate.
+     * Inizializza un nuovo {@code WrapLayout} configurando esplicitamente l'allineamento
+     * e le distanze millimetriche tra i componenti.
      *
-     * @param align l'allineamento (es. {@code FlowLayout.LEFT})
-     * @param hgap  lo spazio orizzontale tra i componenti
-     * @param vgap  lo spazio verticale tra le righe
+     * @param align Il valore di allineamento desiderato.
+     * @param hgap  Lo spazio orizzontale in pixel tra i componenti adiacenti.
+     * @param vgap  Lo spazio verticale in pixel tra le righe sovrapposte.
      */
     public WrapLayout(int align, int hgap, int vgap) {
         super(align, hgap, vgap);
     }
 
     /**
-     * Calcola la dimensione preferita per il contenitore utilizzando questo layout.
-     * Rispetto al FlowLayout standard, calcola l'altezza necessaria basandosi sulla
-     * larghezza attuale del contenitore.
+     * {@inheritDoc}
+     * Calcola le dimensioni preferite per il contenitore target eseguendo una scansione
+     * dei componenti visibili e determinando il numero di righe necessarie in base
+     * alla larghezza attuale della gerarchia grafica.
      *
-     * @param target il contenitore da disporre
-     * @return le dimensioni preferite
+     * @param target Il contenitore i cui componenti devono essere disposti.
+     * @return Un oggetto {@link Dimension} rappresentante la larghezza e l'altezza preferite.
      */
     @Override
     public Dimension preferredLayoutSize(Container target) {
@@ -52,10 +63,13 @@ public class WrapLayout extends FlowLayout {
     }
 
     /**
-     * Calcola la dimensione minima per il contenitore utilizzando questo layout.
+     * {@inheritDoc}
+     * Determina l'ingombro minimo per il contenitore, applicando una
+     * correzione sulla larghezza per prevenire la comparsa di scrollbar orizzontali
+     * ridondanti nei contesti di scorrimento.
      *
-     * @param target il contenitore da disporre
-     * @return le dimensioni minime
+     * @param target Il contenitore i cui componenti devono essere disposti.
+     * @return Un oggetto {@link Dimension} rappresentante la larghezza e l'altezza minime.
      */
     @Override
     public Dimension minimumLayoutSize(Container target) {
@@ -65,18 +79,21 @@ public class WrapLayout extends FlowLayout {
     }
 
     /**
-     * Calcola la dimensione del layout in base alla larghezza del target.
+     * Esegue l'algoritmo di calcolo delle dimensioni del layout basandosi sulla
+     * larghezza effettiva del target.
+     * Il metodo opera in mutua esclusione tramite il lock dell'albero dei componenti
+     * ({@code getTreeLock}) per garantire la coerenza dei calcoli durante le mutazioni della UI.
      *
-     * @param target    il contenitore
-     * @param preferred true per calcolare la dimensione preferita, false per la minima
-     * @return la dimensione calcolata
+     * @param target    Il contenitore oggetto della misurazione.
+     * @param preferred Valore booleano: {@code true} per richiedere la dimensione preferita,
+     * {@code false} per la minima.
+     * @return L'ingombro volumetrico calcolato per la disposizione dei componenti.
      */
     private Dimension layoutSize(Container target, boolean preferred) {
         synchronized (target.getTreeLock()) {
             int targetWidth = target.getSize().width;
 
-            // Se la larghezza è 0, il componente non è ancora stato visualizzato.
-            // Usiamo un valore molto alto per evitare calcoli errati iniziali.
+            // Gestisce la fase embrionale del ciclo di vita del componente in cui la larghezza è nulla
             if (targetWidth == 0) {
                 targetWidth = Integer.MAX_VALUE;
             }
@@ -98,7 +115,7 @@ public class WrapLayout extends FlowLayout {
                 if (m.isVisible()) {
                     Dimension d = preferred ? m.getPreferredSize() : m.getMinimumSize();
 
-                    // Se il componente corrente eccede la larghezza della riga, si va a capo
+                    // Verifica se il componente eccede i confini della riga corrente per forzare l'andata a capo
                     if (rowWidth + d.width > maxWidth) {
                         addRow(dim, rowWidth, rowHeight);
                         rowWidth = 0;
@@ -114,13 +131,13 @@ public class WrapLayout extends FlowLayout {
                 }
             }
 
-            // Aggiunge l'ultima riga
+            // Consolidamento dei dati relativi all'ultima riga elaborata
             addRow(dim, rowWidth, rowHeight);
 
             dim.width += horizontalInsetsAndGap;
             dim.height += insets.top + insets.bottom + (vgap * 2);
 
-            // Ottimizzazione per JScrollPane: forza la larghezza per evitare scrollbar orizzontali inutili
+            // Ottimizzazione specifica per l'integrazione con JScrollPane
             Container scrollPane = SwingUtilities.getAncestorOfClass(JScrollPane.class, target);
             if (scrollPane != null && target.isValid()) {
                 dim.width -= (hgap + 1);
@@ -131,24 +148,22 @@ public class WrapLayout extends FlowLayout {
     }
 
     /**
-     * Aggiorna la dimensione complessiva del contenitore aggiungendo i dati di una riga appena completata.
-     * Incrementa l'altezza totale includendo lo spazio verticale (Vgap) tra le righe e calcola
-     * la larghezza massima raggiunta rispetto alle righe precedenti.
+     * Consolida le misure di una riga appena ultimata all'interno delle dimensioni
+     * complessive del layout.
+     * Aggiorna la larghezza massima del contenitore e incrementa l'altezza totale,
+     * inserendo lo spazio verticale (Vgap) tra le righe successive.
      *
-     * @param dim       L'oggetto {@link Dimension} che accumula le misure totali del layout.
-     * @param rowWidth  La larghezza calcolata della riga appena terminata.
-     * @param rowHeight L'altezza massima rilevata tra i componenti della riga appena terminata.
+     * @param dim       L'istanza di {@link Dimension} che accumula le misurazioni aggregate.
+     * @param rowWidth  L'ampiezza orizzontale occupata dalla riga conclusa.
+     * @param rowHeight L'altezza del componente più voluminoso presente nella riga.
      */
     private void addRow(Dimension dim, int rowWidth, int rowHeight) {
-        // Aggiorna la larghezza complessiva mantenendo il valore massimo riscontrato
         dim.width = Math.max(dim.width, rowWidth);
 
-        // Aggiunge lo spazio verticale solo se non si tratta della prima riga
         if (dim.height > 0) {
             dim.height += getVgap();
         }
 
-        // Incrementa l'altezza totale con l'altezza della riga corrente
         dim.height += rowHeight;
     }
 }

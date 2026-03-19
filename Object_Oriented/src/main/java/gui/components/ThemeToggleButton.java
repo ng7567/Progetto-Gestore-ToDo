@@ -5,71 +5,76 @@ import gui.style.GuiUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 
 /**
- * Rappresenta un pulsante Toggle personalizzato per la gestione del tema dell'applicazione (Chiaro/Scuro).
- * <p>
- * Il componente utilizza un'icona animata {@link ThemeSwitchIcon} per fornire un feedback
- * visivo durante la transizione. Implementa un meccanismo di sicurezza
- * per prevenire sovraccarichi del motore grafico FlatLaf derivanti
- * da click multipli e ravvicinati.
+ * Pulsante grafico (Toggle Button) usato per cambiare il tema dell'applicazione.
+ * Usa l'icona animata {@link ThemeSwitchIcon} e blocca l'intera finestra durante
+ * la transizione per evitare click ripetuti o l'apertura di finestre multiple.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class ThemeToggleButton extends JToggleButton {
 
     /**
-     * Indica se &egrave; in corso una transizione di tema.
-     * Impedisce l'attivazione di ulteriori timer o ricaricamenti della finestra.
-     */
-    private boolean isSwitching = false;
-
-    /**
-     * Costruisce un nuovo {@code ThemeToggleButton}.
-     * <p>
-     * Configura l'estetica del pulsante rimuovendo i bordi standard e applicando
-     * uno stile arrotondato coerente con il design moderno dell'applicazione.
+     * Crea il pulsante per il cambio tema.
+     * Applica un glass pane (pannello invisibile) sopra la finestra
+     * durante l'animazione per "congelare" l'interfaccia e ignorare i click.
      *
-     * @param onReload Callback da eseguire per aggiornare l'interfaccia utente
-     * dopo il cambio del tema.
+     * @param onReload La funzione che verrà eseguita alla fine dell'animazione
+     * per applicare il nuovo tema all'intera finestra.
      */
     public ThemeToggleButton(Runnable onReload) {
-        // Assegna l'icona personalizzata che gestisce l'animazione
+        // Assegna l'icona animata personalizzata
         setIcon(new ThemeSwitchIcon());
 
-        // Sincronizza lo stato iniziale con la preferenza salvata
+        // Imposta lo stato iniziale in base al tema attuale
         setSelected(GuiUtils.isDarkMode());
 
-        // Definisce l'aspetto grafico del componente
+        // Rimuove bordi e sfondi per un look pulito
         setContentAreaFilled(false);
         setBorderPainted(false);
         setFocusPainted(false);
+
+        // Impedisce l'attivazione ripetuta tramite il tasto Spazio o Invio
+        setFocusable(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Applica lo stile arrotondato tramite proprietà FlatLaf
+        // Rende il pulsante completamente arrotondato
         putClientProperty(FlatClientProperties.STYLE, "arc: 999");
 
-        // Gestisce l'evento di selezione con protezione contro i click multipli
+        // Azione eseguita quando l'utente clicca il pulsante
         addActionListener(e -> {
 
-            // Verifica se una transizione &egrave; gi&agrave; stata avviata
-            if (isSwitching) {
-                // Ripristina lo stato grafico precedente per evitare discrepanze visive
-                setSelected(!isSelected());
-                return;
+            // Trova la finestra principale in cui si trova questo bottone
+            Window window = SwingUtilities.getWindowAncestor(this);
+
+            if (window instanceof JFrame frame) {
+                // Recupera il GlassPane
+                Component glassPane = frame.getGlassPane();
+
+                // Mostra il cursore di caricamento (la clessidra o rotellina)
+                glassPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+                // Aggiunge un "muro" che assorbe tutti i click del mouse a vuoto
+                glassPane.addMouseListener(new MouseAdapter() {});
+
+                // Rende attivo il GlassPane: da questo momento l'app è congelata
+                glassPane.setVisible(true);
             }
 
-            // Attiva il blocco logico per ignorare nuovi input
-            isSwitching = true;
-
-            // Aggiorna la configurazione globale del tema
+            // Cambia le variabili di sistema per il tema
             GuiUtils.toggleTheme();
 
-            // Avvia la procedura di ricaricamento della GUI
+            // Avvia il timer per l'animazione
             if (onReload != null) {
-                /*
-                 * Utilizza un javax.swing.Timer per attendere il completamento dell'animazione
-                 * (500ms). Il ritardo garantisce una transizione fluida tra i temi.
-                 */
-                Timer timer = new Timer(550, evt -> onReload.run());
+                Timer timer = new Timer(550, evt -> {
+                    onReload.run();
+
+                    // NOTA: Non serve sbloccare il GlassPane, perché la vecchia
+                    // finestra verrà distrutta e sostituita da una nuova
+                });
                 timer.setRepeats(false);
                 timer.start();
             }

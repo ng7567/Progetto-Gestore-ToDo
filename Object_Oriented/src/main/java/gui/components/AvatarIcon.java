@@ -5,21 +5,32 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
 /**
- * Implementazione personalizzata dell'interfaccia {@link Icon} per creare avatar utente.
- * Genera dinamicamente un'icona circolare contenente l'iniziale dell'utente
- * su uno sfondo colorato determinato in base all'hash del nome.
+ * Rappresenta un'implementazione personalizzata dell'interfaccia {@link Icon} progettata
+ * per generare dinamicamente avatar utente all'interno dell'interfaccia grafica.
+ * Crea un'icona circolare contenente l'iniziale dell'utente sovrapposta a uno sfondo colorato,
+ * calcolato a partire dall'hash dello username.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class AvatarIcon implements Icon {
 
+    /** Il diametro in pixel dell'icona circolare. */
     private final int size;
+
+    /** Il carattere testuale, tipicamente l'iniziale maiuscola dello username, renderizzato al centro dell'avatar. */
     private final String initial;
+
+    /** Il colore di sfondo dell'avatar, generato dinamicamente per garantire varietà visiva e perfetta leggibilità. */
     private final Color color;
 
     /**
-     * Crea un nuovo AvatarIcon.
+     * Inizializza l'icona dell'avatar calcolando istantaneamente l'iniziale e il colore di sfondo.
+     * Utilizza lo spazio colore HSB (Hue, Saturation, Brightness) per assicurare che le tinte
+     * generate casualmente abbiano sempre un contrasto sufficiente con il testo bianco in sovrimpressione.
      *
-     * @param username Il nome utente da cui estrarre l'iniziale e generare il colore.
-     * @param size     Le dimensioni (larghezza e altezza) dell'icona in pixel.
+     * @param username Il nome utente da cui estrarre l'iniziale e derivare matematicamente il colore.
+     * @param size     Il diametro (larghezza e altezza) dell'icona espresso in pixel.
      */
     public AvatarIcon(String username, int size) {
         this.size = size;
@@ -43,13 +54,14 @@ public class AvatarIcon implements Icon {
     }
 
     /**
-     * Disegna l'icona sul componente specificato.
-     * Utilizza primitive grafiche 2D con anti-aliasing per una resa visiva ottimale.
+     * Esegue il rendering grafico dell'avatar sul componente di destinazione.
+     * Sfrutta le primitive grafiche 2D e attiva esplicitamente l'anti-aliasing per garantire
+     * bordi smussati e un'elevata qualità visiva sia per il perimetro del cerchio che per il testo.
      *
-     * @param c Il componente su cui disegnare (non utilizzato in questa implementazione).
-     * @param g Il contesto grafico {@link Graphics}.
-     * @param x La coordinata X dove disegnare.
-     * @param y La coordinata Y dove disegnare.
+     * @param c Il componente grafico su cui l'icona viene disegnata (non utilizzato attivamente in questa implementazione autonoma).
+     * @param g Il contesto grafico {@link Graphics} fornito dal framework Swing.
+     * @param x La coordinata X di partenza per l'operazione di disegno.
+     * @param y La coordinata Y di partenza per l'operazione di disegno.
      */
     @Override
     public void paintIcon(Component c, Graphics g, int x, int y) {
@@ -86,8 +98,10 @@ public class AvatarIcon implements Icon {
 
     /**
      * Restituisce la larghezza dell'icona.
+     * Essendo l'avatar perfettamente circolare, questo valore corrisponde al diametro
+     * specificato in fase di inizializzazione.
      *
-     * @return La larghezza in pixel.
+     * @return La larghezza totale in pixel.
      */
     @Override
     public int getIconWidth() {
@@ -96,10 +110,10 @@ public class AvatarIcon implements Icon {
 
     /**
      * Restituisce l'altezza dell'icona.
-     * Per garantire la coerenza dell'icona circolare, restituisce il medesimo
-     * valore della larghezza.
+     * Per preservare le proporzioni geometriche del cerchio, il valore restituito
+     * è vincolato a coincidere esattamente con la larghezza.
      *
-     * @return L'altezza in pixel, corrispondente alla larghezza.
+     * @return L'altezza totale in pixel.
      */
     @Override
     public int getIconHeight() {

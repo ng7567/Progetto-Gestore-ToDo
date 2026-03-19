@@ -27,73 +27,126 @@ import java.util.Date;
 
 /**
  * Classe di utilità per la gestione dell'interfaccia grafica.
- * Centralizza la gestione dei temi (Chiaro/Scuro), la configurazione degli stili
- * dei componenti Swing, la gestione delle icone e delle palette colori.
- * Implementata con pattern costruttore privato per impedirne l'istanziazione.
+ * Centralizza l'applicazione dei temi (Light/Dark Mode), standardizza
+ * l'istanziazione e lo stile dei componenti Swing (campi di testo, pulsanti, scrollbar),
+ * gestisce il rendering di file SVG e offre metodi di supporto per le finestre.
+ * Ha un costruttore privato per vietarne l'istanziazione.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class GuiUtils {
 
+    /** Logger per tracciare eventuali errori grafici (es. mancato caricamento SVG). */
     private static final Logger LOGGER = Logger.getLogger(GuiUtils.class.getName());
+
+    /** Nodo delle preferenze locali per salvare le impostazioni dell'utente. */
     private static final Preferences prefs = Preferences.userNodeForPackage(GuiUtils.class);
+
+    /** Chiave usata nelle preferenze per salvare lo stato del tema scuro. */
     private static final String PREF_DARK_MODE = "dark_mode_enabled";
+
+    /** Chiave usata nelle preferenze per salvare gli ID delle bacheche già aperte. */
     private static final String PREF_SEEN_BOARDS = "seen_boards_ids_reset";
 
+    /** Font predefinito per l'intera applicazione. */
     private static final String FONT_FAMILY = "Segoe UI";
 
-    // PALETTE COLORI BASE COSTANTI
+    // --- COLORI BASE (COSTANTI) ---
+
+    /** Colore di sfondo globale per il tema chiaro. */
     private static final Color LIGHT_BG     = new Color(255, 255, 255);
+    /** Colore di sfondo per le Card nel tema chiaro. */
     private static final Color LIGHT_CARD   = new Color(245, 245, 245);
+    /** Colore del testo principale nel tema chiaro. */
     private static final Color LIGHT_TEXT   = new Color(51, 51, 51);
+    /** Colore dei bordi nel tema chiaro. */
     private static final Color LIGHT_BORDER = new Color(200, 200, 200);
+    /** Colore di sfondo per i campi di input nel tema chiaro. */
     private static final Color LIGHT_INPUT_BG = new Color(255, 255, 255);
+    /** Colore del cursore di testo nel tema chiaro. */
     private static final Color LIGHT_CARET    = new Color(0, 0, 0);
 
+    /** Colore di sfondo globale per il tema scuro. */
     private static final Color DARK_BG      = new Color(30, 30, 30);
+    /** Colore di sfondo per le Card nel tema scuro. */
     private static final Color DARK_CARD    = new Color(45, 45, 45);
+    /** Colore del testo principale nel tema scuro. */
     private static final Color DARK_TEXT    = new Color(230, 230, 230);
+    /** Colore dei bordi nel tema scuro. */
     private static final Color DARK_BORDER  = new Color(80, 80, 80);
+    /** Colore di sfondo per i campi di input nel tema scuro. */
     private static final Color DARK_INPUT_BG  = new Color(50, 50, 50);
+    /** Colore del cursore di testo nel tema scuro. */
     private static final Color DARK_CARET     = new Color(255, 255, 255);
 
+    /** Colore di partenza per i gradient nel tema chiaro. */
     private static final Color LIGHT_GRADIENT_START = new Color(240, 242, 245);
+    /** Colore di arrivo per i gradient nel tema chiaro. */
     private static final Color LIGHT_GRADIENT_END   = new Color(220, 225, 230);
 
+    /** Colore di partenza per i gradient nel tema scuro. */
     private static final Color DARK_GRADIENT_START = new Color(44, 62, 80);
+    /** Colore di arrivo per i gradient nel tema scuro. */
     private static final Color DARK_GRADIENT_END   = new Color(30, 30, 30);
 
+    /** Colore primario dell'applicazione. */
     public static final Color PRIMARY_COLOR = new Color(52, 152, 219);
+    /** Colore primario per lo stato hover. */
     public static final Color PRIMARY_HOVER = new Color(41, 128, 185);
+    /** Colore di sfondo per l'header superiore. */
     public static final Color HEADER_COLOR = new Color(44, 62, 80);
+    /** Colore secondario per pulsanti o azioni di annullamento. */
     public static final Color SECONDARY_COLOR = new Color(236, 240, 241);
+    /** Colore secondario per lo stato hover. */
     public static final Color SECONDARY_HOVER = new Color(189, 195, 199);
+    /** Colore utilizzato per i link. */
     public static final Color LINK_COLOR = new Color(52, 152, 219);
+    /** Colore utilizzato per i link nello stato hover. */
     public static final Color LINK_HOVER = new Color(41, 128, 185);
 
+    /** Font per i titoli principali. */
     public static final Font FONT_TITLE = new Font(FONT_FAMILY, Font.BOLD, 26);
+    /** Font in grassetto per etichette standard. */
     public static final Font FONT_BOLD = new Font(FONT_FAMILY, Font.BOLD, 14);
+    /** Font normale per testo e campi di input. */
     public static final Font FONT_NORMAL = new Font(FONT_FAMILY, Font.PLAIN, 14);
 
+    /** Dimensione standard per i campi di testo a riga singola. */
     public static final Dimension FIELD_DIMENSION = new Dimension(200, 35);
 
-    // VARIABILI TEMA CORRENTI
+    // --- VARIABILI DEL TEMA (DINAMICHE) ---
+
+    /** Indica se è attivo il tema scuro. */
     private static boolean darkMode;
+    /** Colore di sfondo attuale. */
     private static Color backgroundColor;
+    /** Colore del testo attuale. */
     private static Color textColor;
+    /** Colore di sfondo attuale per le Card. */
     private static Color cardBackground;
+    /** Colore attuale dei bordi. */
     private static Color borderColor;
+    /** Colore di sfondo attuale per i campi di input. */
     private static Color inputBackground;
+    /** Colore attuale del cursore nei campi di testo. */
     private static Color caretColor;
+    /** Colore di partenza attuale per i gradient. */
     private static Color gradientStart;
+    /** Colore di arrivo attuale per i gradient. */
     private static Color gradientEnd;
 
+    // Blocco statico per applicare subito il tema all'avvio dell'app.
     static {
         darkMode = prefs.getBoolean(PREF_DARK_MODE, false);
         applyTheme();
     }
 
     /**
-     * Costruttore privato che impedisce l'istanziazione di questa classe di utilità.
-     * Lancia un'eccezione se invocato tramite reflection.
+     * Costruttore privato.
+     * Lancia un'eccezione se viene richiamato per sbaglio (es. tramite reflection).
+     *
+     * @throws UnsupportedOperationException Sempre lanciata al richiamo.
      */
     private GuiUtils() {
         throw new UnsupportedOperationException("Classe di utilità: istanziazione non consentita.");
@@ -104,51 +157,50 @@ public class GuiUtils {
     // ==========================
 
     /**
-     * Restituisce lo stato attuale del tema (Chiaro/Scuro).
+     * Ritorna lo stato del tema attuale.
      *
-     * @return {@code true} se è attivo il tema scuro, {@code false} altrimenti.
+     * @return {@code true} se il tema scuro è attivo, {@code false} altrimenti.
      */
     public static boolean isDarkMode() { return darkMode; }
 
     /**
-     * Restituisce il colore di sfondo principale corrente.
+     * Restituisce il colore di sfondo globale.
      *
-     * @return L'oggetto {@link Color} rappresentante lo sfondo.
+     * @return L'oggetto {@link Color} dello sfondo globale.
      */
     public static Color getBackgroundColor() { return backgroundColor; }
 
     /**
-     * Restituisce il colore principale del testo corrente.
+     * Restituisce il colore del testo principale.
      *
-     * @return L'oggetto {@link Color} rappresentante il testo.
+     * @return L'oggetto {@link Color} del testo principale.
      */
     public static Color getTextColor() { return textColor; }
 
     /**
-     * Restituisce il colore di sfondo utilizzato per le schede (Card).
+     * Restituisce il colore di sfondo delle Card.
      *
-     * @return L'oggetto {@link Color} per lo sfondo delle schede.
+     * @return L'oggetto {@link Color} dello sfondo delle Card.
      */
     public static Color getCardBackground() { return cardBackground; }
 
     /**
      * Restituisce il colore di sfondo per i campi di input.
      *
-     * @return L'oggetto {@link Color} per i campi di input.
+     * @return L'oggetto {@link Color} di sfondo per i campi di input.
      */
     public static Color getInputBackground() { return inputBackground; }
 
     /**
-     * Restituisce il nome della famiglia di font principale utilizzata dall'applicazione.
+     * Restituisce il nome del font principale in uso.
      *
-     * @return La stringa contenente il nome del font.
+     * @return Il nome del font principale in uso (es. "Segoe UI").
      */
     public static String getFontFamily() { return FONT_FAMILY; }
 
     /**
-     * Alterna lo stato del tema tra chiaro e scuro.
-     * Salva la preferenza in modo persistente nelle impostazioni dell'utente
-     * e aggiorna istantaneamente le variabili di colore globali.
+     * Alterna il tema tra chiaro e scuro.
+     * Salva la preferenza nelle impostazioni locali e aggiorna i colori in memoria.
      */
     public static void toggleTheme() {
         darkMode = !darkMode;
@@ -157,8 +209,8 @@ public class GuiUtils {
     }
 
     /**
-     * Applica i colori corretti alle variabili interne in base al tema selezionato
-     * ed inizializza il Look and Feel FlatLaf corrispondente.
+     * Applica i colori corretti alle variabili in base al tema selezionato
+     * e inizializza il motore FlatLaf per aggiornare l'interfaccia Swing.
      */
     private static void applyTheme() {
         try {
@@ -189,16 +241,18 @@ public class GuiUtils {
     }
 
     // ==========================
-    // SEZIONE GRADIENT E BORDI
+    // GRADIENT E BORDI
     // ==========================
 
     /**
-     * Crea un pannello con uno sfondo sfumato lineare verticale basato sul tema corrente.
+     * Crea un pannello con uno sfondo sfumato (Gradient) verticale,
+     * che si adatta automaticamente ai colori del tema attivo.
      *
-     * @return Un'istanza personalizzata di {@link JPanel}.
+     * @return Un'istanza preconfigurata di {@link JPanel}.
      */
     public static JPanel createGradientPanel() {
         return new JPanel() {
+            /** {@inheritDoc} */
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -215,21 +269,20 @@ public class GuiUtils {
     }
 
     /**
-     * Genera il bordo standard utilizzato per i componenti di input testuale.
+     * Crea il bordo standard utilizzato per i campi di input di testo.
      *
-     * @return Un oggetto {@link Border} composto (linea e margine interno).
+     * @return Un oggetto {@link Border} che combina una linea esterna e un padding.
      */
     public static Border createStandardBorder() {
         return createCustomBorder(borderColor);
     }
 
     /**
-     * Crea un bordo composto personalizzato basato su un colore specifico.
-     * Combina una linea esterna solida con un margine interno (padding)
-     * per migliorare la leggibilità del testo inserito nei campi.
+     * Crea un bordo personalizzato unendo una linea colorata esterna
+     * e un padding di 5 pixel.
      *
      * @param color Il colore della linea del bordo.
-     * @return Un oggetto {@link Border} configurato.
+     * @return Un oggetto {@link Border}.
      */
     private static Border createCustomBorder(Color color) {
         return BorderFactory.createCompoundBorder(
@@ -239,14 +292,15 @@ public class GuiUtils {
     }
 
     // ==========================
-    // SEZIONE COMPONENTI INPUT
+    // COMPONENTI INPUT
     // ==========================
 
     /**
-     * Genera un campo di testo standardizzato per l'applicazione, applicando colori e font del tema.
+     * Crea un campo di testo (JTextField) standardizzato, applicando
+     * il font e i colori del tema corrente.
      *
-     * @param columns Il numero di colonne (larghezza approssimativa) del campo.
-     * @return Un {@link JTextField} formattato.
+     * @param columns La larghezza approssimativa in numero di colonne.
+     * @return Un oggetto {@link JTextField} istanziato e formattato.
      */
     public static JTextField createStandardTextField(int columns) {
         JTextField txt = new JTextField(columns);
@@ -260,10 +314,10 @@ public class GuiUtils {
     }
 
     /**
-     * Genera un campo per l'inserimento della password standardizzato.
+     * Crea un campo per la password (JPasswordField) standardizzato.
      *
-     * @param columns Il numero di colonne (larghezza approssimativa) del campo.
-     * @return Un {@link JPasswordField} formattato.
+     * @param columns La larghezza approssimativa in numero di colonne.
+     * @return Un oggetto {@link JPasswordField} istanziato e formattato.
      */
     public static JPasswordField createPasswordField(int columns) {
         JPasswordField pf = new JPasswordField(columns);
@@ -276,9 +330,10 @@ public class GuiUtils {
     }
 
     /**
-     * Applica uno stile moderno personalizzato a un componente JSpinner.
+     * Applica uno stile arrotondato e personalizzato a un JSpinner
+     * utilizzando le proprietà di FlatLaf.
      *
-     * @param spinner Lo {@link JSpinner} da stilizzare.
+     * @param spinner Il modulo {@link JSpinner} da stilizzare.
      */
     public static void styleSpinner(JSpinner spinner) {
         if (spinner == null) return;
@@ -305,11 +360,11 @@ public class GuiUtils {
     }
 
     /**
-     * Avvolge un campo password in un pannello contenente un pulsante a forma di occhio
-     * per visualizzare/nascondere il testo in chiaro.
+     * Inserisce un JPasswordField all'interno di un pannello che include
+     * un pulsante a forma di occhio per mostrare o nascondere la password in chiaro.
      *
-     * @param passField Il {@link JPasswordField} da inserire.
-     * @return Un {@link JPanel} contenente il campo testuale e il pulsante.
+     * @param passField Il campo password base da inglobare.
+     * @return Un {@link JPanel} contenente il campo e il pulsante.
      */
     public static JPanel createPasswordPanelWithEye(JPasswordField passField) {
         JPanel wrapper = new JPanel(new BorderLayout(0, 0));
@@ -355,30 +410,32 @@ public class GuiUtils {
     }
 
     // ==========================
-    // SEZIONE PULSANTI
+    // PULSANTI
     // ==========================
 
     /**
-     * Applica un effetto visivo dinamico di hover a un bottone.
-     * Registra un listener che modifica il colore di sfondo quando il cursore
-     * entra o esce dall'area del componente.
+     * Applica un effetto hover al pulsante, cambiandone il colore di sfondo
+     * quando il cursore del mouse ci passa sopra.
      *
-     * @param btn    Il {@link JButton} a cui applicare l'effetto.
+     * @param btn    Il pulsante a cui applicare l'effetto.
      * @param normal Il colore di sfondo in stato normale.
-     * @param hover  Il colore di sfondo in stato attivo (mouse sopra).
+     * @param hover  Il colore di sfondo in stato hover.
      */
     private static void setButtonHoverEffect(JButton btn, Color normal, Color hover) {
         btn.setBackground(normal);
         btn.addMouseListener(new MouseAdapter() {
+            /** {@inheritDoc} */
             @Override public void mouseEntered(MouseEvent e) { btn.setBackground(hover); }
+            /** {@inheritDoc} */
             @Override public void mouseExited(MouseEvent e) { btn.setBackground(normal); }
         });
     }
 
     /**
-     * Applica lo stile primario (colore principale del brand) a un bottone.
+     * Applica lo stile primario (colore principale) a un pulsante,
+     * rendendolo l'azione principale della vista.
      *
-     * @param btn Il {@link JButton} da stilizzare.
+     * @param btn Il componente {@link JButton} da formattare.
      */
     public static void stylePrimaryButton(JButton btn) {
         configureBaseButton(btn, Color.WHITE, FONT_BOLD);
@@ -386,9 +443,10 @@ public class GuiUtils {
     }
 
     /**
-     * Applica lo stile secondario (neutro) a un bottone.
+     * Applica lo stile secondario (neutro) a un pulsante,
+     * usato per azioni come "Annulla" o opzioni meno importanti.
      *
-     * @param btn Il {@link JButton} da stilizzare.
+     * @param btn Il componente {@link JButton} da formattare.
      */
     public static void styleSecondaryButton(JButton btn) {
         configureBaseButton(btn, Color.BLACK, FONT_NORMAL);
@@ -396,11 +454,10 @@ public class GuiUtils {
     }
 
     /**
-     * Configura le proprietà comuni per i bottoni dell'applicazione.
-     * Imposta font, cursore a mano, margini e disabilita gli effetti
-     * grafici predefiniti di Swing per consentire uno stile custom.
+     * Configura le proprietà di base per i pulsanti (font, cursore a forma di mano, margini)
+     * e rimuove gli stili predefiniti di Swing.
      *
-     * @param btn  Il bottone da processare.
+     * @param btn  Il pulsante da configurare.
      * @param fg   Il colore del testo.
      * @param font Il font da utilizzare.
      */
@@ -416,9 +473,10 @@ public class GuiUtils {
     }
 
     /**
-     * Formatta un bottone in modo che assomigli a un link ipertestuale testuale.
+     * Rende un normale pulsante Swing simile a un collegamento (link) web,
+     * rimuovendo lo sfondo e cambiando il colore del testo al passaggio del mouse.
      *
-     * @param btn Il {@link JButton} da stilizzare.
+     * @param btn Il pulsante da modificare.
      */
     public static void styleLinkButton(JButton btn) {
         btn.setFont(FONT_NORMAL);
@@ -430,16 +488,18 @@ public class GuiUtils {
         btn.setFocusPainted(false);
         btn.setOpaque(false);
         btn.addMouseListener(new MouseAdapter() {
+            /** {@inheritDoc} */
             @Override public void mouseEntered(MouseEvent e) { btn.setForeground(LINK_HOVER); }
+            /** {@inheritDoc} */
             @Override public void mouseExited(MouseEvent e) { btn.setForeground(LINK_COLOR); }
         });
     }
 
     /**
-     * Applica un bordo tratteggiato personalizzato a un bottone, utile per
-     * azioni come l'inserimento di nuovi elementi o upload.
+     * Applica un bordo tratteggiato al pulsante, utile per indicare
+     * azioni come la creazione di un nuovo elemento o l'upload di file.
      *
-     * @param btn Il {@link JButton} da stilizzare.
+     * @param btn Il bottone da formattare.
      */
     public static void styleDashedButton(JButton btn) {
         Color bgNormal = new Color(245, 245, 245);
@@ -460,18 +520,16 @@ public class GuiUtils {
     }
 
     /**
-     * Aggiunge la funzionalità di Annulla (Ctrl+Z) e Ripristina (Ctrl+Y)
-     * a un'area di testo specifica.
+     * Aggiunge la funzionalità Annulla (CTRL+Z) e Ripeti (CTRL+Y)
+     * a un'area di testo tramite tastiera.
      *
-     * @param textArea L'area di testo a cui applicare il supporto Undo/Redo.
+     * @param textArea La {@link JTextArea} a cui aggiungere i listener.
      */
     public static void addUndoSupport(JTextArea textArea) {
         javax.swing.undo.UndoManager undoManager = new javax.swing.undo.UndoManager();
 
-        // Registra ogni singola modifica del documento
         textArea.getDocument().addUndoableEditListener(e -> undoManager.addEdit(e.getEdit()));
 
-        // Configura la combinazione Ctrl + Z (Annulla)
         textArea.getInputMap().put(KeyStroke.getKeyStroke("control Z"), "Undo");
         textArea.getActionMap().put("Undo", new AbstractAction() {
             @Override
@@ -482,7 +540,6 @@ public class GuiUtils {
             }
         });
 
-        // Configura la combinazione Ctrl + Y (Ripristina)
         textArea.getInputMap().put(KeyStroke.getKeyStroke("control Y"), "Redo");
         textArea.getActionMap().put("Redo", new AbstractAction() {
             @Override
@@ -495,10 +552,10 @@ public class GuiUtils {
     }
 
     /**
-     * Configura una JTextArea allineandola al tema corrente.
-     * Aggiunge automaticamente il supporto per Annulla/Ripristina.
+     * Configura lo stile di una JTextArea con i colori del tema e
+     * aggiunge automaticamente il supporto per Annulla/Ripeti.
      *
-     * @param textArea La {@link JTextArea} da aggiornare.
+     * @param textArea La {@link JTextArea} da formattare.
      */
     public static void styleTextArea(JTextArea textArea) {
         textArea.setBackground(inputBackground);
@@ -514,9 +571,9 @@ public class GuiUtils {
     // ==========================
 
     /**
-     * Modifica lo stile di una ComboBox dedicata alle priorità.
+     * Applica lo stile personalizzato a una JComboBox utilizzata per selezionare la priorità.
      *
-     * @param combo La {@link JComboBox} tipizzata su {@link model.Priority}.
+     * @param combo L'oggetto dropdown parametrizzato sulle classi enumerative Priorità.
      */
     public static void stylePriorityComboBox(JComboBox<model.Priority> combo) {
         configureComboBoxUI(combo, inputBackground, textColor);
@@ -524,43 +581,36 @@ public class GuiUtils {
     }
 
     /**
-     * Configura i colori e i renderer per una ComboBox.
-     * Gestisce la logica di ricolorazione dinamica del testo in base alla
-     * priorità selezionata e associa la UI personalizzata per le frecce.
+     * Sostituisce la UI standard della JComboBox per applicare colori
+     * personalizzati sia allo sfondo che alla freccia (dropdown).
      *
-     * @param combo      La ComboBox da configurare.
-     * @param bgColor    Il colore di sfondo del componente.
-     * @param arrowColor Il colore per l'indicatore di selezione (freccia).
+     * @param combo      La JComboBox da modificare.
+     * @param bgColor    Il colore di sfondo.
+     * @param arrowColor Il colore per la freccia.
      */
     private static void configureComboBoxUI(JComboBox<model.Priority> combo, Color bgColor, Color arrowColor) {
         combo.setBackground(bgColor);
         combo.setForeground(arrowColor);
         combo.setFont(FONT_NORMAL);
 
-        // Assegna il Renderer personalizzato (estratto)
         combo.setRenderer(new PriorityComboBoxRenderer(bgColor));
-
-        // Assegna la UI personalizzata (estratta)
         combo.setUI(new PriorityComboBoxUI(bgColor, arrowColor));
 
-        // Listener per il cambio di selezione
         combo.addActionListener(e -> {
             if (combo.getSelectedItem() instanceof model.Priority selected) {
                 combo.setForeground(selected.getColor());
             }
         });
 
-        // Colore iniziale
         if (combo.getSelectedItem() instanceof model.Priority selected) {
             combo.setForeground(selected.getColor());
         }
     }
 
     /**
-     * Configura il componente di selezione della data (JDateChooser) per
-     * integrarsi visivamente con il tema attivo.
+     * Applica i colori del tema corrente al componente esterno JDateChooser.
      *
-     * @param dateChooser Il componente {@link JDateChooser}.
+     * @param dateChooser Il componente calendario.
      */
     public static void styleDateChooser(com.toedter.calendar.JDateChooser dateChooser) {
         if (dateChooser == null) return;
@@ -606,10 +656,10 @@ public class GuiUtils {
     // ==========================
 
     /**
-     * Crea un'etichetta di testo standardizzata.
+     * Istanzia una JLabel standard con il font e il colore del tema corrente.
      *
-     * @param text Il contenuto testuale.
-     * @return Il {@link JLabel} generato.
+     * @param text Il testo da mostrare.
+     * @return La {@link JLabel} creata.
      */
     public static JLabel createLabel(String text) {
         JLabel lbl = new JLabel(text);
@@ -619,10 +669,10 @@ public class GuiUtils {
     }
 
     /**
-     * Crea un'etichetta di testo standardizzata in grassetto.
+     * Istanzia una JLabel in grassetto con il colore del tema corrente.
      *
-     * @param text Il contenuto testuale.
-     * @return Il {@link JLabel} generato.
+     * @param text Il testo da mostrare.
+     * @return La {@link JLabel} in grassetto.
      */
     public static JLabel createBoldLabel(String text) {
         JLabel lbl = new JLabel(text);
@@ -632,9 +682,10 @@ public class GuiUtils {
     }
 
     /**
-     * Forza una dimensione fissa e uniforme per un array di bottoni forniti.
+     * Imposta la stessa dimensione fissa per tutti i pulsanti passati
+     * come parametro, in modo da renderli uniformi nel layout.
      *
-     * @param buttons Un array o varargs di {@link JButton}.
+     * @param buttons Variabile (varargs) di moduli {@link JButton}.
      */
     public static void makeSameSize(JButton... buttons) {
         Dimension size = new Dimension(110, 40);
@@ -644,12 +695,12 @@ public class GuiUtils {
     }
 
     /**
-     * Carica un'immagine vettoriale SVG dal percorso di risorsa, ridimensionandola.
+     * Carica un file SVG dal filesystem e lo ridimensiona in base alle misure fornite.
      *
-     * @param path   Il percorso interno al progetto dell'SVG.
-     * @param width  Larghezza in pixel.
-     * @param height Altezza in pixel.
-     * @return L'oggetto {@link Icon} renderizzato, o {@code null} se il caricamento fallisce.
+     * @param path   Il percorso del file.
+     * @param width  Larghezza desiderata in pixel.
+     * @param height Altezza desiderata in pixel.
+     * @return L'oggetto {@link Icon} creato, o {@code null} in caso di errore.
      */
     public static Icon loadSVG(String path, int width, int height) {
         try {
@@ -661,13 +712,13 @@ public class GuiUtils {
     }
 
     /**
-     * Carica un'immagine vettoriale SVG applicando un filtro monocromatico di ricolorazione.
+     * Carica un file SVG e ne cambia il colore, riempiendolo con una tinta unita.
      *
-     * @param path   Il percorso interno al progetto dell'SVG.
-     * @param width  Larghezza in pixel.
-     * @param height Altezza in pixel.
-     * @param color  Il colore solido da applicare all'intera icona.
-     * @return L'oggetto {@link Icon} ricolorato, o {@code null} se il caricamento fallisce.
+     * @param path   Il percorso del file.
+     * @param width  Larghezza desiderata in pixel.
+     * @param height Altezza desiderata in pixel.
+     * @param color  Il colore da usare per ricolorare l'icona.
+     * @return L'oggetto {@link Icon} ricolorato, o {@code null} in caso di errore.
      */
     public static Icon loadSVG(String path, int width, int height, Color color) {
         try {
@@ -681,11 +732,11 @@ public class GuiUtils {
     }
 
     /**
-     * Sostituisce il frame attuale ricaricando un'istanza fresca generata tramite callback.
-     * Utilizzato solitamente per applicare i cambiamenti di tema globale.
+     * Chiude il frame attuale e ne istanzia uno nuovo passato tramite la funzione Supplier,
+     * mantenendone le dimensioni e la posizione sullo schermo (utile per cambiare tema senza far saltare la finestra).
      *
-     * @param currentFrame Il frame attualmente visualizzato.
-     * @param frameCreator La funzione lambda che genera il nuovo frame.
+     * @param currentFrame Il frame attualmente aperto.
+     * @param frameCreator La funzione (Supplier) che restituisce il nuovo frame.
      */
     public static void reloadWindow(JFrame currentFrame, Supplier<JFrame> frameCreator) {
         Point location = currentFrame.getLocation();
@@ -700,11 +751,11 @@ public class GuiUtils {
     }
 
     /**
-     * Gestisce la transizione visiva tra due Frame preservando la posizione o
-     * lo stato di massimizzazione sullo schermo.
+     * Passa da una finestra all'altra mantenendo la stessa dimensione e posizione,
+     * per poi chiudere il vecchio frame.
      *
-     * @param fromFrame Il frame di partenza che verrà distrutto.
-     * @param toFrame   Il frame di destinazione che verrà mostrato.
+     * @param fromFrame Il frame di partenza che verrà chiuso.
+     * @param toFrame   Il frame di destinazione che verrà aperto.
      */
     public static void transition(JFrame fromFrame, JFrame toFrame) {
         int state = fromFrame.getExtendedState();
@@ -719,11 +770,11 @@ public class GuiUtils {
     }
 
     /**
-     * Calcola il colore ottimale del testo (Chiaro o Scuro) garantendo il miglior contrasto
-     * basandosi sulla luminanza dello sfondo fornito.
+     * Calcola se usare il colore del testo chiaro o scuro in base alla luminosità
+     * del colore di sfondo passato come parametro.
      *
-     * @param background Il colore di sfondo su cui stampare il testo.
-     * @return {@link #DARK_TEXT} se lo sfondo è chiaro, {@link #LIGHT_TEXT} se è scuro.
+     * @param background Il colore di sfondo da analizzare.
+     * @return Il colore per il testo che garantisce il miglior contrasto.
      */
     public static Color getContrastColor(Color background){
         double brightness = (0.299 * background.getRed() + 0.587 * background.getGreen() + 0.114 * background.getBlue());
@@ -735,9 +786,10 @@ public class GuiUtils {
     // ==========================
 
     /**
-     * Crea un pannello scrollabile con un'interfaccia utente personalizzata, minimalista e trasparente.
+     * Crea un JScrollPane trasparente e minimalista, nascondendo la barra
+     * di scorrimento finché non viene utilizzata.
      *
-     * @param content Il componente interno da scorrere.
+     * @param content Il componente interno che deve essere scorrevole.
      * @return Il {@link JScrollPane} configurato.
      */
     public static JScrollPane createModernScrollPane(JComponent content) {
@@ -758,22 +810,30 @@ public class GuiUtils {
     }
 
     /**
-     * UI personalizzata per le barre di scorrimento, progettata per essere invisibile finché
-     * non viene attivata o finché non ci si passa sopra col mouse.
+     * UI personalizzata per le scrollbar che le rende minimali.
+     * Rimuove i pulsanti freccia e disegna solo un cursore arrotondato
+     * che diventa visibile al passaggio del mouse o al trascinamento.
      */
     private static class ModernScrollBarUI extends BasicScrollBarUI {
+        /** {@inheritDoc} */
         @Override
         protected void configureScrollBarColors() {
             this.thumbColor = new Color(0, 0, 0, 0);
             this.trackColor = new Color(0, 0, 0, 0);
         }
 
+        /** {@inheritDoc} */
         @Override
         protected JButton createDecreaseButton(int orientation) { return createZeroButton(); }
 
+        /** {@inheritDoc} */
         @Override
         protected JButton createIncreaseButton(int orientation) { return createZeroButton(); }
 
+        /**
+         * Crea un pulsante invisibile (0x0 pixel).
+         * @return Un bottone vuoto.
+         */
         private JButton createZeroButton() {
             JButton btn = new JButton();
             btn.setPreferredSize(new Dimension(0, 0));
@@ -782,14 +842,13 @@ public class GuiUtils {
             return btn;
         }
 
+        /** {@inheritDoc} */
         @Override
         protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
-            // Intenzionalmente vuoto: il design minimalista non prevede il disegno del binario di scorrimento
+            // Intenzionalmente vuoto per non disegnare la traccia di scorrimento
         }
 
-        /**
-         * Disegna il cursore (thumb) della barra di scorrimento arrotondato.
-         */
+        /** {@inheritDoc} */
         @Override
         protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
             if (thumbBounds.isEmpty() || !scrollbar.isEnabled()) return;
@@ -806,12 +865,10 @@ public class GuiUtils {
         }
 
         /**
-         * Calcola la geometria e la posizione del cursore (thumb) della barra di scorrimento.
-         * Adatta le dimensioni del cursore in base all'orientamento della barra
-         * (verticale o orizzontale) e aggiunge un leggero padding.
+         * Calcola le dimensioni e la posizione del cursore della scrollbar.
          *
-         * @param thumbBounds L'area rettangolare destinata al cursore.
-         * @return Un oggetto {@link Rectangle} con le coordinate e dimensioni calcolate.
+         * @param thumbBounds Area rettangolare destinata al cursore.
+         * @return Il rettangolo ricalcolato.
          */
         private Rectangle calculateThumbGeometry(Rectangle thumbBounds) {
             final int thumbSize = 8;
@@ -835,11 +892,10 @@ public class GuiUtils {
         }
 
         /**
-         * Determina il colore del cursore della barra di scorrimento.
-         * Applica una trasparenza costante e scurisce la tonalità se l'utente
-         * sta trascinando la barra o se il mouse si trova sopra di essa.
+         * Determina il colore del cursore aggiungendo trasparenza e
+         * scurendolo se l'utente sta trascinando la barra.
          *
-         * @return L'oggetto {@link Color} risultante con canale Alpha impostato a 180.
+         * @return Il colore finale per il cursore.
          */
         private Color calculateThumbColor() {
             Color baseColor = UIManager.getColor("ScrollBar.thumb");
@@ -852,6 +908,7 @@ public class GuiUtils {
             return new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 180);
         }
 
+        /** {@inheritDoc} */
         @Override
         public Dimension getPreferredSize(JComponent c) {
             return new Dimension(14, super.getPreferredSize(c).height);
@@ -859,9 +916,10 @@ public class GuiUtils {
     }
 
     /**
-     * Sostituisce il disegno standard di una CheckBox per fornire un look vettoriale moderno e rotondo.
+     * Sostituisce il disegno predefinito della JCheckBox con uno stile personalizzato
+     * circolare, disegnando il segno di spunta a mano con Java2D.
      *
-     * @param checkBox Il {@link JCheckBox} da modificare.
+     * @param checkBox La JCheckBox da modificare.
      */
     public static void styleCheckbox(JCheckBox checkBox) {
         checkBox.setOpaque(false);
@@ -870,6 +928,7 @@ public class GuiUtils {
         final int iconSize = 22;
 
         checkBox.setIcon(new Icon() {
+            /** {@inheritDoc} */
             @Override
             public void paintIcon(Component c, Graphics g, int x, int y) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -879,11 +938,14 @@ public class GuiUtils {
                 g2.drawOval(x + 1, y + 1, iconSize - 2, iconSize - 2);
                 g2.dispose();
             }
+            /** {@inheritDoc} */
             @Override public int getIconWidth() { return iconSize; }
+            /** {@inheritDoc} */
             @Override public int getIconHeight() { return iconSize; }
         });
 
         checkBox.setSelectedIcon(new Icon() {
+            /** {@inheritDoc} */
             @Override
             public void paintIcon(Component c, Graphics g, int x, int y) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -901,17 +963,19 @@ public class GuiUtils {
                 g2.draw(checkMark);
                 g2.dispose();
             }
+            /** {@inheritDoc} */
             @Override public int getIconWidth() { return iconSize; }
+            /** {@inheritDoc} */
             @Override public int getIconHeight() { return iconSize; }
         });
     }
 
     /**
-     * Verifica se l'id della bacheca passato non è mai stato "visto" o aperto dall'utente locale.
-     * Controlla la stringa salvata nelle preferenze dell'applicazione locale.
+     * Controlla nelle preferenze locali se l'ID della bacheca è già stato aperto
+     * dall'utente su questo PC. Serve per mostrare il badge "Nuovo".
      *
-     * @param boardId L'ID numerico della bacheca.
-     * @return {@code true} se risulta "nuova", {@code false} altrimenti.
+     * @param boardId L'ID della bacheca.
+     * @return {@code true} se la bacheca non è mai stata aperta, {@code false} altrimenti.
      */
     public static boolean isBoardNew(int boardId) {
         String seenIds = prefs.get(PREF_SEEN_BOARDS, "");
@@ -926,10 +990,10 @@ public class GuiUtils {
     }
 
     /**
-     * Registra nelle preferenze locali che una specifica bacheca è stata vista.
-     * Toglierà il badge visuale "Nuovo" alle successive aperture.
+     * Salva l'ID della bacheca nelle preferenze locali in modo che non venga
+     * più considerata come "Nuova" ai successivi avvii.
      *
-     * @param boardId L'ID numerico della bacheca.
+     * @param boardId L'ID della bacheca da segnare come letta.
      */
     public static void markBoardAsSeen(int boardId) {
         if (!isBoardNew(boardId)) return;
@@ -943,9 +1007,9 @@ public class GuiUtils {
     }
 
     /**
-     * Applica uno stile squadrato alle checkbox utilizzate per il filtraggio (es. nel BoardFrame).
+     * Applica uno stile arrotondato personalizzato alle checkbox usate nei menu dei filtri.
      *
-     * @param checkBox La {@link JCheckBox} da alterare.
+     * @param checkBox La checkbox da formattare.
      */
     public static void styleFilterCheckBox(JCheckBox checkBox) {
         checkBox.setOpaque(false);
@@ -957,8 +1021,11 @@ public class GuiUtils {
         int size = 20;
 
         checkBox.setIcon(new Icon() {
+            /** {@inheritDoc} */
             @Override public int getIconWidth() { return size; }
+            /** {@inheritDoc} */
             @Override public int getIconHeight() { return size; }
+            /** {@inheritDoc} */
             @Override
             public void paintIcon(Component c, Graphics g, int x, int y) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -971,8 +1038,11 @@ public class GuiUtils {
         });
 
         checkBox.setSelectedIcon(new Icon() {
+            /** {@inheritDoc} */
             @Override public int getIconWidth() { return size; }
+            /** {@inheritDoc} */
             @Override public int getIconHeight() { return size; }
+            /** {@inheritDoc} */
             @Override
             public void paintIcon(Component c, Graphics g, int x, int y) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -989,17 +1059,25 @@ public class GuiUtils {
     }
 
     /**
-     * Implementazione personalizzata dell'interfaccia UI per la ComboBox delle priorità.
+     * Classe che disegna la UI personalizzata per la combobox delle priorità.
      */
     private static class PriorityComboBoxUI extends BasicComboBoxUI {
+        /** Colore di sfondo del menu a tendina. */
         private final Color bgColor;
+        /** Colore della freccia per l'apertura del menu. */
         private final Color arrowColor;
 
+        /**
+         * Crea la UI personalizzata.
+         * @param bgColor Il colore di sfondo.
+         * @param arrowColor Il colore per la freccia.
+         */
         public PriorityComboBoxUI(Color bgColor, Color arrowColor) {
             this.bgColor = bgColor;
             this.arrowColor = arrowColor;
         }
 
+        /** {@inheritDoc} */
         @Override
         protected JButton createArrowButton() {
             BasicArrowButton btn = new BasicArrowButton(
@@ -1009,6 +1087,7 @@ public class GuiUtils {
             return btn;
         }
 
+        /** {@inheritDoc} */
         @Override
         public void paintCurrentValue(Graphics g, Rectangle bounds, boolean hasFocus) {
             g.setColor(bgColor);
@@ -1031,16 +1110,22 @@ public class GuiUtils {
     }
 
     /**
-     * Implementazione personalizzata per renderizzare i singoli elementi della ComboBox,
-     * consentendo ad ogni voce di mostrare il proprio colore.
+     * Renderizza ogni singola voce della combobox applicando il colore
+     * specifico della priorità associata.
      */
     private static class PriorityComboBoxRenderer extends DefaultListCellRenderer {
+        /** Colore di sfondo base per le voci non selezionate. */
         private final Color bgColor;
 
+        /**
+         * Istanzia il renderer.
+         * @param bgColor Il colore di sfondo.
+         */
         public PriorityComboBoxRenderer(Color bgColor) {
             this.bgColor = bgColor;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
@@ -1060,11 +1145,10 @@ public class GuiUtils {
     }
 
     /**
-     * Apre un indirizzo URL nel browser predefinito del sistema operativo.
-     * Gestisce automaticamente l'aggiunta del protocollo di sicurezza (HTTPS)
-     * qualora non fosse specificato nella stringa di input.
+     * Apre il link nel browser web predefinito di sistema.
+     * Aggiunge "https://" in automatico se l'URL passato non lo contiene.
      *
-     * @param urlString L'indirizzo web testuale da visualizzare nel browser.
+     * @param urlString Il link da aprire.
      */
     public static void openWebpage(String urlString) {
         if (urlString == null || urlString.trim().isEmpty()) {
@@ -1098,9 +1182,10 @@ public class GuiUtils {
     }
 
     /**
-     * Imposta l'icona dell'applicazione per il frame specificato.
+     * Imposta l'icona dell'applicazione per la finestra specificata,
+     * che diventerà visibile nella barra delle applicazioni del sistema operativo.
      *
-     * @param frame Il {@link JFrame} a cui applicare l'icona personalizzata.
+     * @param frame Il JFrame a cui assegnare l'icona.
      */
     public static void setAppIcon(JFrame frame) {
         try {
@@ -1117,13 +1202,13 @@ public class GuiUtils {
     }
 
     /**
-     * Mostra un dialogo di conferma standardizzato con i pulsanti "Sì" e "No".
+     * Mostra un pop-up di conferma standard con pulsanti "Sì" e "No".
      *
-     * @param parent      Il componente genitore per il posizionamento.
-     * @param message     Il messaggio da visualizzare.
+     * @param parent      Il componente genitore da cui dipende il pop-up.
+     * @param message     Il messaggio da mostrare all'utente.
      * @param title       Il titolo della finestra.
-     * @param messageType La tipologia del messaggio definita da JOptionPane.
-     * @return {@code true} se l'utente seleziona "Sì", {@code false} altrimenti.
+     * @param messageType Il tipo di icona (es. Error, Warning, Information).
+     * @return {@code true} se l'utente clicca "Sì", {@code false} altrimenti.
      */
     public static boolean showConfirmDialog(Component parent, String message, String title, int messageType) {
         Object[] options = {"Sì", "No"};
@@ -1142,19 +1227,22 @@ public class GuiUtils {
     }
 
     /**
-     * DTO per trasportare i componenti collegati alla selezione combinata di data e ora.
+     * Oggetto (Record) usato per restituire in blocco i componenti grafici che
+     * costituiscono il selettore combinato di data e ora.
      *
-     * @param panel       Il pannello padre contenente gli elementi.
-     * @param dateChooser Il controllo grafico della selezione della data.
-     * @param timeSpinner Il controllo a spin dell'orario.
+     * @param panel       Il pannello contenitore di base.
+     * @param dateChooser Il componente per scegliere la data.
+     * @param timeSpinner Il componente per scegliere l'orario.
      */
     public record DateTimePicker(JPanel panel, JDateChooser dateChooser, JSpinner timeSpinner) {}
 
     /**
-     * Costruisce e assembla un modulo unificato per la selezione di Data e Ora.
+     * Istanzia un pannello che contiene sia un selettore di date (JDateChooser)
+     * che uno spinner per l'orario. Sincronizza i due componenti in modo che
+     * l'orario sia disabilitato se non è stata scelta una data.
      *
-     * @param initialDate L'eventuale data preselezionata in partenza.
-     * @return L'oggetto {@link DateTimePicker} per accedere ai componenti grafici originati.
+     * @param initialDate La data e l'ora da mostrare all'avvio (se presenti).
+     * @return Il record {@link DateTimePicker} contenente i componenti creati.
      */
     public static DateTimePicker createDateTimePicker(Date initialDate) {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -1175,7 +1263,7 @@ public class GuiUtils {
         spinner.setPreferredSize(new Dimension(80, 30));
         styleSpinner(spinner);
 
-        // Logica Iniziale
+        // Imposta i valori iniziali
         if (initialDate != null) {
             dc.setDate(initialDate);
             spinner.setValue(initialDate);
@@ -1188,7 +1276,7 @@ public class GuiUtils {
             spinner.setEnabled(false);
         }
 
-        // Listener per attivazione dinamica
+        // Abilita lo spinner dell'orario solo se la data è stata impostata
         dc.addPropertyChangeListener("date", evt ->
                 spinner.setEnabled(dc.getDate() != null)
         );
@@ -1201,23 +1289,22 @@ public class GuiUtils {
     }
 
     /**
-     * Formatta un testo lungo per i tooltip, troncandolo e aggiungendo i puntini di sospensione.
-     * Forza una larghezza massima per evitare tooltip che occupano tutto lo schermo.
+     * Formatta un testo lungo per un tooltip, troncandolo dopo una certa lunghezza
+     * e usando tag HTML per forzare l'andata a capo automatica, in modo che
+     * il testo non esca dallo schermo.
      *
-     * @param text      Il testo originale.
-     * @param maxLength Il numero massimo di caratteri prima del troncamento.
-     * @return La stringa formattata in HTML pronta per setToolTipText.
+     * @param text      Il testo da mostrare nel tooltip.
+     * @param maxLength Il numero massimo di caratteri prima di aggiungere i tre punti (...).
+     * @return La stringa formattata con tag HTML.
      */
     public static String formatTooltip(String text, int maxLength) {
         if (text == null || text.trim().isEmpty()) return null;
 
-        String cleanText = text.replace("\n", " "); // Rimuove gli a capo
+        String cleanText = text.replace("\n", " ");
         if (cleanText.length() > maxLength) {
             cleanText = cleanText.substring(0, maxLength) + "...";
         }
 
-        // Il tag <p width='250'> forza il tooltip ad andare a capo se necessario,
-        // evitando che si estenda orizzontalmente all'infinito.
         return "<html><p width='250'>" + cleanText + "</p></html>";
     }
 }

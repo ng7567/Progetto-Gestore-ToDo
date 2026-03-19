@@ -23,28 +23,46 @@ import java.util.Map;
  * Gestisce la visualizzazione dei dati del task, l'interazione per il completamento
  * tramite checkbox e il menu contestuale per le operazioni rapide.
  * Implementa una logica adattiva per colori e icone in base allo sfondo della card.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class TaskCard extends JPanel {
 
+    /** L'oggetto di dominio contenente i dati del task rappresentato. */
     private final transient ToDo todo;
-    private final transient Controller controller;
-    private final transient Runnable onUpdate; // Callback per aggiornare la UI madre
 
+    /** Riferimento al controller per la gestione delle operazioni di business. */
+    private final transient Controller controller;
+
+    /** L'azione di callback da eseguire per notificare l'interfaccia madre di un aggiornamento. */
+    private final transient Runnable onUpdate;
+
+    /** Stringa costante utilizzata per i titoli delle finestre di dialogo di errore. */
     private static final String ERROR = "Errore";
 
-    // Componenti UI
+    // --- Componenti UI ---
+    /** L'etichetta testuale principale che mostra il titolo del task. */
     private JLabel lblTitle;
+
+    /** L'etichetta testuale secondaria che mostra una versione troncata della descrizione. */
     private JLabel lblDesc;
+
+    /** L'etichetta testuale che riporta la data e l'ora di scadenza (se prevista). */
     private JLabel lblDate;
+
+    /** La casella di controllo laterale per impostare lo stato di completamento del task. */
     private JCheckBox chkDone;
+
+    /** Il pulsante grafico (con icona a tre puntini) che apre il menu delle operazioni aggiuntive. */
     private JButton btnOptions;
 
     /**
-     * Costruisce una nuova card per il task specificato.
+     * Inizializza la rappresentazione grafica per lo specifico task fornito.
      *
-     * @param todo       L'oggetto ToDo contenente i dati del task.
-     * @param controller Il controller per eseguire operazioni di persistenza.
-     * @param onUpdate   Callback da eseguire quando lo stato del task cambia.
+     * @param todo       L'oggetto ToDo contenente i dati da visualizzare.
+     * @param controller Il gestore della logica applicativa per le operazioni di persistenza.
+     * @param onUpdate   La funzione di callback invocata in seguito a mutamenti di stato del task.
      */
     public TaskCard(ToDo todo, Controller controller, Runnable onUpdate) {
         this.todo = todo;
@@ -56,7 +74,7 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Inizializza i componenti grafici primari e il layout della card.
+     * Struttura i componenti grafici primari e definisce il layout ({@link BorderLayout}) della card.
      */
     private void initUI() {
         setLayout(new BorderLayout(10, 0));
@@ -72,7 +90,8 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Configura il colore di sfondo della card, effettuando il parsing della stringa esadecimale.
+     * Configura dinamicamente il colore di sfondo della card, interpretando la stringa esadecimale
+     * salvata nel database o ripiegando sul colore predefinito di sistema in caso di errore.
      */
     private void setupBackgroundColor() {
         Color cardColor = GuiUtils.getCardBackground();
@@ -87,7 +106,7 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Crea e configura la checkbox laterale per il completamento del task.
+     * Inizializza e posiziona la checkbox laterale delegata alla gestione dello stato di completamento.
      */
     private void setupCheckbox() {
         chkDone = new JCheckBox();
@@ -100,7 +119,8 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Gestisce l'evento di interazione sulla checkbox e aggiorna il database.
+     * Intercetta l'interazione dell'utente sulla checkbox e richiede l'aggiornamento
+     * dello stato di completamento del task a livello di database.
      */
     private void handleCheckboxToggle() {
         boolean isChecked = chkDone.isSelected();
@@ -114,12 +134,13 @@ public class TaskCard extends JPanel {
             chkDone.setSelected(!isChecked);
             JOptionPane.showMessageDialog(getBaseFrame(),
                     "Errore durante l'aggiornamento dello stato.",
-                    "Errore Salvataggio", JOptionPane.ERROR_MESSAGE);
+                    ERROR, JOptionPane.ERROR_MESSAGE);
         }
     }
 
     /**
-     * Assembla il pannello centrale contenente Titolo, Descrizione e Data di Scadenza.
+     * Struttura e aggrega nel pannello centrale le informazioni testuali principali:
+     * Titolo, Descrizione (se presente) e Data di Scadenza (se prevista).
      */
     private void setupCenterPanel() {
         JPanel centerPanel = new JPanel(new GridLayout(0, 1, 0, 4));
@@ -147,7 +168,8 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Assembla il pannello destro contenente i badge (Condiviso, Priorità) e le icone di stato.
+     * Struttura il pannello contestuale destro, deputato a ospitare i badge informativi
+     * (es. stato di condivisione, livello di priorità) e gli indicatori visivi di presenza allegati (link, immagini).
      */
     private void setupRightPanel() {
         JPanel rightPanel = new JPanel(new BorderLayout());
@@ -201,14 +223,13 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Crea un componente JLabel configurato con un'icona SVG e un tooltip.
-     * Utilizza le utilità di sistema per il caricamento e il ridimensionamento
-     * dell'icona vettoriale con il colore specificato.
+     * Inizializza un componente JLabel configurato per esporre un'icona vettoriale SVG
+     * accoppiata a un suggerimento testuale (tooltip).
      *
-     * @param path    Il percorso relativo della risorsa SVG all'interno del progetto.
-     * @param color   Il colore da applicare agli elementi grafici dell'icona.
-     * @param tooltip Il testo informativo da visualizzare al passaggio del mouse.
-     * @return Un oggetto {@code JLabel} pronto per essere inserito nell'interfaccia.
+     * @param path    Il percorso relativo della risorsa SVG all'interno del file system del progetto.
+     * @param color   Il colore da applicare in sovrimpressione ai tracciati vettoriali dell'icona.
+     * @param tooltip Il testo informativo visualizzato al passaggio del cursore del mouse.
+     * @return L'oggetto {@code JLabel} interamente configurato.
      */
     private JLabel createIconLabel(String path, Color color, String tooltip) {
         JLabel lbl = new JLabel();
@@ -218,11 +239,11 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Crea e configura il pannello contenente il badge colorato della priorità.
-     * Estrae i dati direttamente dall'oggetto ToDo e applica uno stile
-     * con angoli arrotondati tramite le proprietà client di FlatLaf.
+     * Genera un contenitore grafico rappresentante il livello di priorità assegnato al task.
+     * Sfrutta le estensioni client di FlatLaf per definire un raggio di curvatura
+     * dinamico (arc) sui bordi del componente.
      *
-     * @return Un {@code JPanel} trasparente che agisce da contenitore per l'etichetta della priorità.
+     * @return Il pannello ({@code JPanel}) trasparente contenente l'etichetta formattata.
      */
     private JPanel createPriorityBadge() {
         JLabel lblPrio = new JLabel(todo.getPriority().getLabel());
@@ -241,31 +262,27 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Configura i listener del mouse per la gestione estetica della card.
-     * Registra i listener necessari per l'aggiornamento visivo durante l'ingresso
-     * e l'uscita del cursore (hover) e applica lo stile del cursore a mano a tutti
-     * i componenti interni.
+     * Associa i listener legati agli eventi del mouse per gestire il feedback visivo (hover).
      * <p>
-     * Nota: La logica di apertura dei dettagli tramite click è delegata al
-     * {@link gui.events.TaskDragListener} per prevenire conflitti di eventi e
-     * garantire la distinzione tra click e trascinamento.
+     * Nota architetturale: L'operazione di visualizzazione dei dettagli mediante click
+     * è demandata esternamente (al {@link gui.events.TaskDragListener}) per eliminare
+     * i conflitti di interpretazione tra click singolo e inizio di un'operazione di trascinamento.
      */
     private void configureMouseEvents() {
         MouseAdapter hoverListener = new MouseAdapter() {
             @Override public void mouseEntered(MouseEvent e) { repaint(); }
             @Override public void mouseExited(MouseEvent e) { repaint(); }
-            // La gestione del mouseClicked è demandata al DragListener per evitare duplicazioni
         };
         this.addMouseListener(hoverListener);
         applyCursorToAll(this, btnOptions);
     }
 
     /**
-     * Applica il cursore a forma di mano a tutti i componenti interni.
-     * Evita di aggiungere listener ricorsivi per prevenire il rimbalzo degli eventi.
+     * Scandisce ricorsivamente la gerarchia dei componenti applicando il cursore a forma
+     * di puntatore agli elementi interattivi.
      *
-     * @param container  Il contenitore padre da scansionare.
-     * @param excludeBtn Il bottone da escludere dall'aggiornamento.
+     * @param container  Il contenitore padre radice dell'albero di ricerca.
+     * @param excludeBtn Il pulsante o componente specifico da preservare da questa alterazione.
      */
     private void applyCursorToAll(Container container, JButton excludeBtn) {
         for (Component c : container.getComponents()) {
@@ -280,35 +297,15 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Applica ricorsivamente un listener a tutti i componenti interni della card.
-     * Esclude pulsanti o checkbox specifici per evitare conflitti di click e imposta
-     * il cursore a mano (HAND_CURSOR) per indicare l'interattività.
+     * Genera il pulsante opzioni customizzato raffigurante tre ellissi impilate verticalmente.
+     * Sovrascrive il metodo di disegno (paintComponent) per tracciare manualmente
+     * i punti e simulare un'ombra circolare semi-trasparente durante l'interazione (hover).
      *
-     * @param container  Il contenitore padre da cui iniziare la scansione dei componenti.
-     * @param listener   Il MouseListener da associare ai componenti validi.
-     * @param excludeBtn Il bottone specifico (es. tre puntini) da escludere dall'associazione.
-     */
-    private void applyListenerToAll(Container container, java.awt.event.MouseListener listener, JButton excludeBtn) {
-        for (Component c : container.getComponents()) {
-            if (c == chkDone || c == excludeBtn) continue;
-            c.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            c.addMouseListener(listener);
-
-            if (c instanceof Container childContainer) {
-                applyListenerToAll(childContainer, listener, excludeBtn);
-            }
-        }
-    }
-
-    /**
-     * Crea il bottone circolare con l'icona dei tre puntini verticali.
-     * Personalizza il rendering grafico per disegnare i punti centrali e gestire
-     * l'effetto hover circolare.
-     *
-     * @return Un oggetto {@code JButton} configurato per l'apertura del menu opzioni.
+     * @return L'oggetto {@code JButton} deputato all'attivazione del menu contestuale.
      */
     private JButton createThreeDotsButton() {
         JButton btn = new JButton() {
+            /** {@inheritDoc} */
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -351,13 +348,13 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Costruisce e mostra il menu contestuale con le opzioni del task.
-     * Differenzia le voci disponibili (Sposta, Elimina, Lascia) in base al ruolo
-     * dell'utente (OWNER o SHARED).
+     * Istanzia e visualizza il menu flottante (JPopupMenu) contenente
+     * le azioni eseguibili sul task. Le opzioni ("Elimina", "Sposta") vengono filtrate
+     * dinamicamente in base ai privilegi associati al ruolo dell'utente corrente.
      *
-     * @param invoker Il componente che ha richiesto l'apertura del menu.
-     * @param x       La coordinata X relativa al componente invoker.
-     * @param y       La coordinata Y relativa al componente invoker.
+     * @param invoker Il componente grafico scatenante che ha richiesto l'invocazione del menu.
+     * @param x       L'offset sull'asse X per l'ancoraggio del popup.
+     * @param y       L'offset sull'asse Y per l'ancoraggio del popup.
      */
     private void showOptionsMenu(Component invoker, int x, int y) {
         JPopupMenu popup = new JPopupMenu();
@@ -383,8 +380,10 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Crea la voce di menu dedicata alla ridenominazione del task.
-     * @return Un {@code JMenuItem} configurato con la logica di input per il nuovo titolo.
+     * Inizializza l'elemento di menu associato alla funzionalità di ridenominazione.
+     * Richiama una finestra di dialogo nativa per la raccolta del nuovo titolo.
+     *
+     * @return L'istanza di {@code JMenuItem} configurata.
      */
     private JMenuItem createRenameMenuItem() {
         JMenuItem item = new JMenuItem("Rinomina");
@@ -398,9 +397,10 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Esegue l'operazione di ridenominazione tramite il controller.
-     * In caso di errore, ripristina il titolo originale e avvisa l'utente.
-     * @param newTitle Il nuovo titolo testuale da assegnare al task.
+     * Coordina l'interazione con il livello logico per salvare il nuovo titolo nel database.
+     * Implementa un meccanismo di rollback locale qualora l'operazione di persistenza fallisca.
+     *
+     * @param newTitle La stringa alfanumerica rappresentante il nuovo titolo assegnato.
      */
     private void executeRename(String newTitle) {
         String old = todo.getTitle();
@@ -419,8 +419,10 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Crea la voce di menu per l'eliminazione definitiva del task.
-     * @return Un {@code JMenuItem} configurato per la cancellazione (riservato al proprietario).
+     * Inizializza l'elemento di menu associato alla funzionalità di distruzione fisica (DELETE).
+     * Tale operazione, distruttiva e irreversibile, è preclusa ai ruoli non proprietari.
+     *
+     * @return L'istanza di {@code JMenuItem} configurata.
      */
     private JMenuItem createDeleteMenuItem() {
         JMenuItem itemDelete = new JMenuItem("Elimina");
@@ -441,8 +443,10 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Crea la voce di menu per permettere a un collaboratore di abbandonare il task.
-     * @return Un {@code JMenuItem} configurato per rimuovere la condivisione lato utente.
+     * Inizializza l'elemento di menu che consente la dissociazione
+     * di un collaboratore dal task (abbandono della condivisione).
+     *
+     * @return L'istanza di {@code JMenuItem} configurata.
      */
     private JMenuItem createLeaveMenuItem() {
         JMenuItem itemLeave = new JMenuItem("Lascia");
@@ -463,7 +467,8 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Gestisce la logica di spostamento del task verso un'altra bacheca dell'utente.
+     * Governa il flusso logico interattivo per consentire al proprietario di alterare
+     * l'associazione relazionale del task, riallocandolo su una differente bacheca target.
      */
     private void moveTodoToAnotherBoard() {
         List<Board> allBoards = controller.getUserBoards();
@@ -492,7 +497,8 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Apre il dialogo dei dettagli avanzati del task.
+     * Istanzia e rende visibile la finestra di dialogo modale adibita
+     * all'ispezione ed editazione estesa dei metadati del task.
      */
     public void openDetails() {
         Window parentWindow = SwingUtilities.getWindowAncestor(this);
@@ -500,8 +506,12 @@ public class TaskCard extends JPanel {
         dialog.setVisible(true);
     }
 
-    // --- DISEGNO PERSONALIZZATO E STILE ---
-
+    /**
+     * {@inheritDoc}
+     * Intercetta la fase di disegno per rimpiazzare i bordi rettangolari standard
+     * di Swing con una sagoma smussata, modulandone dinamicamente il colore
+     * al passaggio del cursore.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -530,8 +540,8 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Aggiorna dinamicamente font e colori della card in base allo stato del task
-     * e al colore di sfondo impostato dall'utente.
+     * Forza la ricalibrazione e ridisegnazione dei parametri tipografici (font, colori)
+     * basando le logiche di contrasto sull'indice di luminanza dello sfondo corrente.
      */
     private void refreshStyle() {
         boolean darkBackground = isDark(getBackground());
@@ -547,9 +557,9 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Applica lo stile visivo per i task completati (testo barrato e colori tenui).
+     * Implementa i tratti stilistici del completamento (font depotenziato cromaticamente e barrato).
      *
-     * @param darkBackground {@code true} se lo sfondo della card è scuro.
+     * @param darkBackground Variabile booleana, {@code true} se la luminanza calcolata risulta bassa.
      */
     private void applyCompletedStyle(boolean darkBackground) {
         Font originalFont = GuiUtils.FONT_BOLD;
@@ -566,9 +576,10 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Applica lo stile visivo per i task attivi, calcolando i contrasti e
-     * gestendo l'eventuale stato di scadenza.
-     * @param darkBackground {@code true} se lo sfondo della card è scuro.
+     * Implementa i tratti stilistici predefiniti attivi, allocando cromie appropriate in
+     * base allo sfondo e richiamando controlli condizionali per eventuali allarmi temporali (scadenze).
+     *
+     * @param darkBackground Variabile booleana, {@code true} se la luminanza calcolata risulta bassa.
      */
     private void applyActiveStyle(boolean darkBackground) {
         lblTitle.setFont(GuiUtils.FONT_BOLD);
@@ -603,10 +614,11 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Imposta il colore del testo solo se il componente grafico è stato istanziato.
+     * Esegue in sicurezza l'assegnazione cromatica su un controllo Swing,
+     * sopprimendo l'esecuzione qualora il componente non risulti istanziato (null-safe).
      *
-     * @param component Il componente JLabel target (può essere null).
-     * @param color     Il colore da applicare.
+     * @param component L'etichetta bersaglio della mutazione.
+     * @param color     L'oggetto Colore designato per l'assegnazione in primo piano (foreground).
      */
     private void setForegroundSafe(JLabel component, Color color) {
         if (component != null) {
@@ -615,11 +627,11 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Determina se un colore è considerato scuro basandosi sul calcolo della sua luminanza.
-     * Utilizza la formula pesata dei colori primari (0.299R + 0.587G + 0.114B).
+     * Computa empiricamente l'indice di luminanza apparente ricorrendo all'equazione
+     * fotometrica ITU-R BT.601 (0.299R + 0.587G + 0.114B).
      *
-     * @param color Il colore da sottoporre ad analisi.
-     * @return {@code true} se la luminanza calcolata è inferiore a 140, indicando un colore scuro.
+     * @param color L'entità cromatica soggetta all'estrazione delle componenti.
+     * @return {@code true} se il valore di uscita risulta marcatamente inferiore alla soglia di mezzo.
      */
     private boolean isDark(Color color) {
         double luminance = (0.299 * color.getRed() + 0.587 * color.getGreen() + 0.114 * color.getBlue());
@@ -627,10 +639,10 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Verifica se il task corrente ha superato la data di scadenza.
-     * Il controllo fallisce se non è impostata una data o se il task risulta già completato.
+     * Valuta l'aderenza tra la data limite registrata e il tempo macchina corrente.
+     * La violazione si verifica esclusivamente su task la cui spunta di completamento risulti vacante.
      *
-     * @return {@code true} se la data di scadenza è antecedente al timestamp attuale.
+     * @return {@code true} se il timestamp puntatore risulta inferiore alla misurazione di sistema.
      */
     private boolean isOverdue() {
         if (todo.getExpiryDate() == null || todo.isCompleted()) return false;
@@ -639,11 +651,11 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Accorcia una stringa di testo se questa supera la lunghezza massima consentita.
-     * Aggiunge i puntini di sospensione al termine della sottostringa troncata.
+     * Riduce proattivamente la lunghezza della stringa per assicurare il contenimento
+     * visivo nel modulo grafico (ellissi terminale per stringhe lunghe).
      *
-     * @param text Il testo originale da elaborare.
-     * @return Il testo troncato a 80 caratteri seguito da "...", oppure il testo originale se entro i limiti.
+     * @param text Il corpo testuale da conformare alle tolleranze metriche.
+     * @return La stringa processata.
      */
     private String truncateText(String text) {
         int maxLength = 80;
@@ -652,11 +664,11 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Produce una versione leggermente più scura del colore fornito in input.
-     * Applica un fattore di riduzione costante a tutte le componenti RGB.
+     * Esegue un oscuramento omogeneo tramite manipolazione in riduzione proporzionale
+     * del vettore dei canali primari (RGB).
      *
-     * @param color Il colore di partenza da scurire.
-     * @return Un nuovo oggetto {@code Color} con luminosità ridotta del 4%.
+     * @param color Il punto di genesi cromatica.
+     * @return Il color derivato (intensità decrescente del 4%).
      */
     private Color darkenColor(Color color) {
         double factor = 0.96;
@@ -667,17 +679,17 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Restituisce l'oggetto del dominio ToDo associato a questa componente grafica.
+     * Recupera l'astrazione concettuale primaria (Entity) vincolata a tale frammento dell'interfaccia.
      *
-     * @return L'entità {@code ToDo} rappresentata dalla card.
+     * @return Il blocco {@link ToDo}.
      */
     public ToDo getTodo() { return this.todo; }
 
     /**
-     * Calcola la dimensione massima consentita per la card all'interno del contenitore.
-     * Adatta dinamicamente la larghezza in base alle dimensioni della finestra principale.
+     * {@inheritDoc}
+     * Computa attivamente le dimensioni limite, interrogando geometricamente il frame genitore.
      *
-     * @return Un oggetto {@code Dimension} rappresentante la larghezza massima e l'altezza preferita.
+     * @return Costrutto dimensionale con un tetto elastico di larghezza.
      */
     @Override
     public Dimension getMaximumSize() {
@@ -689,9 +701,9 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Definisce la dimensione minima che la card deve occupare per garantire la leggibilità.
+     * {@inheritDoc}
      *
-     * @return Un oggetto {@code Dimension} con larghezza minima fissata a 200 pixel.
+     * @return Costrutto dimensionale con sbarramento minimo inderogabile.
      */
     @Override
     public Dimension getMinimumSize() {
@@ -699,18 +711,18 @@ public class TaskCard extends JPanel {
     }
 
     /**
-     * Specifica l'allineamento orizzontale della componente rispetto al suo contenitore.
+     * {@inheritDoc}
      *
-     * @return Il valore costante {@code Component.CENTER_ALIGNMENT}.
+     * @return Direttiva float statica.
      */
     @Override
     public float getAlignmentX() { return Component.CENTER_ALIGNMENT; }
 
     /**
-     * Recupera la finestra principale (Window) che contiene gerarchicamente questa card.
-     * Viene utilizzata come riferimento per il posizionamento dei dialoghi modali.
+     * Ricerca la cima dell'albero gerarchico grafico.
+     * Necessario per garantire il blocco dei flussi (modalità) durante l'invocazione di dialog box.
      *
-     * @return L'antenato di tipo {@code Window} della card, o {@code null} se non trovato.
+     * @return Modulo Window radice (può ricadere a null se l'albero è disconnesso).
      */
     private Window getBaseFrame() {
         return SwingUtilities.getWindowAncestor(this);

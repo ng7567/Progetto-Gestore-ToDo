@@ -14,29 +14,39 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Implementazione concreta dell'interfaccia UserDAO.
- * Gestisce l'accesso diretto al database per le operazioni relative agli utenti,
- * garantendo la chiusura sicura delle risorse e delegando la sicurezza delle password.
+ * Implementazione concreta dell'interfaccia {@link UserDAO}.
+ * Gestisce l'accesso diretto al database PostgreSQL per le operazioni relative agli utenti,
+ * occupandosi dell'autenticazione sicura e della persistenza dei profili.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class UserDAOImpl implements UserDAO {
 
-    // Logger per tracciamento errori
     private static final Logger LOGGER = Logger.getLogger(UserDAOImpl.class.getName());
 
     /**
-     * Tenta di autenticare un utente verificando le credenziali nel database.
-     * Utilizza funzioni di hash sicure (tramite SecurityUtils) per il controllo della password.
+     * Inizializza l'implementazione del Data Access Object per gli utenti.
+     */
+    public UserDAOImpl() {
+        // Costruttore di default
+    }
+
+    /**
+     * {@inheritDoc}
+     * Esegue il controllo della password confrontando l'input con l'hash memorizzato
+     * tramite le utilità di sicurezza del sistema.
      *
      * @param username Il nome utente fornito.
      * @param password La password in chiaro fornita.
-     * @return L'oggetto {@link User} se l'autenticazione ha successo, {@code null} altrimenti.
+     * @return L'oggetto {@link User} popolato se le credenziali sono corrette;
+     * {@code null} in caso di mancata corrispondenza o utente inesistente.
      * @throws SQLException Se si verifica un errore durante l'esecuzione della query.
      */
     @Override
     public User authenticate(String username, String password) throws SQLException {
         String sql = "SELECT user_id, username, password FROM users WHERE username = ?";
 
-        // RISOLTO: Ora la Connection è dentro il try-with-resources
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -44,7 +54,6 @@ public class UserDAOImpl implements UserDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    // L'utente esiste, recupera l'hash e controlla la password
                     String storedHash = rs.getString("password");
 
                     if (util.SecurityUtils.checkPassword(password, storedHash)) {
@@ -57,15 +66,17 @@ public class UserDAOImpl implements UserDAO {
                 }
             }
         }
-        return null; // Credenziali errate o utente non trovato
+        return null;
     }
 
     /**
-     * Registra un nuovo utente nel sistema salvando la password in formato hash.
+     * {@inheritDoc}
+     * Genera l'hash della password prima di procedere con l'inserimento fisico nel database.
      *
-     * @param user L'oggetto {@link User} da registrare (con password in chiaro temporanea).
-     * @return {@code true} se l'inserimento avviene con successo, {@code false} altrimenti.
-     * @throws SQLException Se si verifica un errore SQL (incluso il duplicato dello username).
+     * @param user L'oggetto {@link User} da registrare.
+     * @return {@code true} se la registrazione ha avuto successo;
+     * {@code false} se l'inserimento non ha prodotto modifiche nel database.
+     * @throws SQLException Se si verifica un errore SQL, inclusa la violazione di univocità dello username.
      */
     @Override
     public boolean registerUser(User user) throws SQLException {
@@ -76,7 +87,6 @@ public class UserDAOImpl implements UserDAO {
 
             pstmt.setString(1, user.getUsername());
 
-            // Genera l'hash della password prima di salvarla nel DB
             String hashedPassword = util.SecurityUtils.hashPassword(user.getPassword());
             pstmt.setString(2, hashedPassword);
 
@@ -89,34 +99,34 @@ public class UserDAOImpl implements UserDAO {
     }
 
     /**
-     * Verifica l'esistenza di un nome utente nel database tramite query ottimizzata (SELECT 1).
+     * {@inheritDoc}
      *
      * @param username Il nome utente da controllare.
-     * @return {@code true} se l'utente esiste, {@code false} altrimenti.
-     * @throws SQLException Se si verifica un errore SQL.
+     * @return {@code true} se lo username è già registrato;
+     * {@code false} se non è stata trovata alcuna corrispondenza.
+     * @throws SQLException Se si verifica un errore durante l'interrogazione del database.
      */
     @Override
     public boolean userExists(String username) throws SQLException {
         String sql = "SELECT 1 FROM users WHERE username = ?";
 
-        // RISOLTO: Ora la Connection è dentro il try-with-resources
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, username);
             try (ResultSet rs = pstmt.executeQuery()) {
-                return rs.next(); // Se c'è almeno un risultato, l'utente esiste
+                return rs.next();
             }
         }
     }
 
     /**
-     * Esegue una ricerca parziale (LIKE) sugli utenti, escludendo l'utente corrente.
-     * Limita i risultati a 10 occorrenze per efficienza prestazionale.
+     * {@inheritDoc}
+     * Limita i risultati restituiti per ottimizzare le prestazioni della ricerca.
      *
      * @param query           La stringa di ricerca parziale.
      * @param excludeUsername Il nome utente da escludere dai risultati.
-     * @return Una lista di username trovati, o una lista vuota in caso di nessun risultato o errore.
+     * @return Una lista di username corrispondenti ai criteri. Restituisce una lista vuota (<b>mai null</b>) in caso di errore o assenza di match.
      */
     @Override
     public List<String> searchUsers(String query, String excludeUsername) {
@@ -135,7 +145,6 @@ public class UserDAOImpl implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            // Log con Lambda
             LOGGER.log(Level.SEVERE, e, () -> "Errore durante la ricerca utenti con query: " + query);
         }
         return users;

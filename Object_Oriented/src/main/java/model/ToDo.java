@@ -7,43 +7,75 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Rappresenta un singolo Task (attività) all'interno di una bacheca.
+ * Rappresenta un singolo ToDo (o Task) all'interno di una bacheca.
  * Contiene tutte le informazioni relative al contenuto, alla scadenza,
- * alla priorità e alla gestione dei collaboratori.
+ * alla priorità e agli utenti che ci collaborano.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class ToDo {
 
+    /** Colore di sfondo predefinito in formato esadecimale (bianco). */
     private static final String DEFAULT_BG_COLOR = "#FFFFFF";
 
+    /** ID numerico univoco del task nel database. */
     private int id;
+
+    /** Titolo o nome breve del task. */
     private String title;
+
+    /** Testo lungo che descrive i dettagli del task. */
     private String description;
+
+    /** Data e ora in cui il task scade. */
     private Timestamp expiryDate;
+
+    /** Indirizzo web (URL) salvato come link allegato al task. */
     private String urlLink;
+
+    /** Percorso nel file system dell'immagine allegata al task. */
     private String imagePath;
+
+    /** Colore di sfondo del task salvato come testo esadecimale (es. "#FF0000"). */
     private String backgroundColor;
+
+    /** Indica se il task è stato completato (spuntato). */
     private boolean isCompleted;
+
+    /** Numero che indica la posizione del task per l'ordinamento nella bacheca. */
     private int positionOrder;
+
+    /** Livello di importanza del task. */
     private Priority priority;
+
+    /** ID della bacheca a cui appartiene questo task. */
     private int boardId;
+
+    /** Username dell'utente che ha creato il task. */
     private String ownerUsername;
+
+    /** Lista degli username degli utenti invitati a collaborare. */
     private List<String> collaborators = new ArrayList<>();
+
+    /** Indica il ruolo dell'utente che sta guardando il task per la gestione dei permessi UI (es. "OWNER" o "SHARED"). */
     private String role;
 
     /**
-     * Costruisce un'istanza vuota di default.
-     * Metodo utilizzato per l'inizializzazione progressiva tramite i setter.
+     * Crea un task vuoto.
+     * Viene usato principalmente per creare un oggetto base da riempire
+     * in seguito usando i metodi setter.
      */
     public ToDo() {}
 
     /**
-     * Costruisce un task con i parametri base necessari alla creazione.
-     * Inizializza lo stato come non completato e imposta lo sfondo bianco di default.
+     * Crea un task con le informazioni base necessarie.
+     * Imposta in automatico lo stato a "non completato" e lo sfondo a bianco.
      *
-     * @param boardId     L'identificativo della bacheca di appartenenza.
-     * @param title       Il titolo testuale del task.
-     * @param description La descrizione dettagliata dell'attività.
-     * @param expiryDate  La data e l'ora di scadenza prevista.
+     * @param boardId     L'ID della bacheca in cui inserire il task.
+     * @param title       Il titolo del task.
+     * @param description Il testo con i dettagli dell'attività.
+     * @param expiryDate  La data e l'ora di scadenza.
      * @param priority    Il livello di priorità assegnato.
      */
     public ToDo(int boardId, String title, String description, Timestamp expiryDate, Priority priority) {
@@ -58,10 +90,10 @@ public class ToDo {
     }
 
     /**
-     * Imposta il colore di sfondo partendo da un oggetto {@link Color}.
-     * Esegue la conversione automatica del colore nel formato esadecimale (es. #FFFFFF).
+     * Imposta il colore di sfondo partendo da un oggetto {@link Color} di Java.
+     * Converte in automatico il colore nel formato di testo esadecimale (es. "#FFFFFF").
      *
-     * @param color L'oggetto colore selezionato dall'interfaccia grafica.
+     * @param color Il colore scelto nell'interfaccia UI (se nullo, usa il bianco di default).
      */
     public void setBackgroundColorObj(Color color) {
         if (color == null) {
@@ -74,79 +106,207 @@ public class ToDo {
 
     // --- GETTERS & SETTERS ---
 
-    /** @return L'username del proprietario del task. */
+    /**
+     * Restituisce l'username del creatore del task.
+     *
+     * @return L'username del proprietario.
+     */
     public String getOwnerUsername() { return ownerUsername; }
-    /** @param ownerUsername L'username da impostare come proprietario. */
+
+    /**
+     * Imposta l'username del creatore del task.
+     *
+     * @param ownerUsername L'username da salvare come proprietario.
+     */
     public void setOwnerUsername(String ownerUsername) { this.ownerUsername = ownerUsername; }
 
-    /** @return La lista degli username dei collaboratori. */
+    /**
+     * Restituisce la lista di chi collabora al task.
+     *
+     * @return La lista degli username dei collaboratori.
+     */
     public List<String> getCollaborators() { return collaborators; }
-    /** @param collaborators La lista di collaboratori da associare. */
+
+    /**
+     * Imposta la lista dei collaboratori.
+     *
+     * @param collaborators La lista di username da associare al task.
+     */
     public void setCollaborators(List<String> collaborators) { this.collaborators = collaborators; }
 
-    /** @return L'ID univoco del task. */
+    /**
+     * Restituisce l'ID del task.
+     *
+     * @return L'ID numerico univoco nel database.
+     */
     public int getId() { return id; }
-    /** @param id L'identificativo univoco da assegnare. */
+
+    /**
+     * Imposta l'ID del task.
+     *
+     * @param id L'ID numerico da assegnare.
+     */
     public void setId(int id) { this.id = id; }
 
-    /** @return Il titolo del task. */
+    /**
+     * Restituisce il titolo del task.
+     *
+     * @return Il titolo in formato testo.
+     */
     public String getTitle() { return title; }
-    /** @param title Il titolo testuale da impostare. */
+
+    /**
+     * Imposta il titolo del task.
+     *
+     * @param title Il testo da usare come titolo.
+     */
     public void setTitle(String title) { this.title = title; }
 
-    /** @return La descrizione del task. */
+    /**
+     * Restituisce la descrizione dettagliata del task.
+     *
+     * @return Il testo della descrizione.
+     */
     public String getDescription() { return description; }
-    /** @param description La descrizione testuale da impostare. */
+
+    /**
+     * Imposta la descrizione del task.
+     *
+     * @param description Il testo con i dettagli da salvare.
+     */
     public void setDescription(String description) { this.description = description; }
 
-    /** @return Il timestamp di scadenza. */
+    /**
+     * Restituisce la scadenza del task.
+     *
+     * @return L'oggetto {@link Timestamp} con data e ora.
+     */
     public Timestamp getExpiryDate() { return expiryDate; }
-    /** @param expiryDate La data di scadenza da impostare. */
+
+    /**
+     * Imposta la scadenza del task.
+     *
+     * @param expiryDate La data e l'ora da salvare.
+     */
     public void setExpiryDate(Timestamp expiryDate) { this.expiryDate = expiryDate; }
 
-    /** @return Il link URL associato al task. */
+    /**
+     * Restituisce il link web allegato.
+     *
+     * @return L'indirizzo URL salvato.
+     */
     public String getUrlLink() { return urlLink; }
-    /** @param urlLink L'indirizzo web da collegare. */
+
+    /**
+     * Imposta un link web da allegare al task.
+     *
+     * @param urlLink L'indirizzo URL da salvare.
+     */
     public void setUrlLink(String urlLink) { this.urlLink = urlLink; }
 
-    /** @return Il percorso dell'immagine allegata. */
+    /**
+     * Restituisce il percorso dell'immagine allegata.
+     *
+     * @return Il percorso del file immagine.
+     */
     public String getImagePath() { return imagePath; }
-    /** @param imagePath Il percorso del file immagine sul disco. */
+
+    /**
+     * Imposta il percorso di un'immagine da allegare.
+     *
+     * @param imagePath Il percorso del file sul computer.
+     */
     public void setImagePath(String imagePath) { this.imagePath = imagePath; }
 
-    /** @return Il codice esadecimale del colore di sfondo. */
+    /**
+     * Restituisce il colore di sfondo del task.
+     *
+     * @return Il codice esadecimale del colore (es. "#FFFFFF").
+     */
     public String getBackgroundColor() { return backgroundColor; }
-    /** @param backgroundColor Il codice colore esadecimale da impostare. */
+
+    /**
+     * Imposta il colore di sfondo usando un testo esadecimale.
+     *
+     * @param backgroundColor Il codice colore (es. "#000000") da salvare.
+     */
     public void setBackgroundColor(String backgroundColor) { this.backgroundColor = backgroundColor; }
 
-    /** @return {@code true} se il task è completato. */
+    /**
+     * Controlla se il task è completato.
+     *
+     * @return {@code true} se è completato, {@code false} se è ancora da fare.
+     */
     public boolean isCompleted() { return isCompleted; }
-    /** @param completed Lo stato di completamento da impostare. */
+
+    /**
+     * Cambia lo stato di completamento del task.
+     *
+     * @param completed {@code true} per segnarlo come finito, {@code false} per riaprirlo.
+     */
     public void setCompleted(boolean completed) { this.isCompleted = completed; }
 
-    /** @return La posizione numerica del task nella bacheca. */
+    /**
+     * Restituisce la posizione del task per l'ordinamento a video.
+     *
+     * @return Il numero che indica la posizione nella lista.
+     */
     public int getPositionOrder() { return positionOrder; }
-    /** @param positionOrder L'indice di ordinamento da impostare. */
+
+    /**
+     * Imposta la posizione del task per l'ordinamento.
+     *
+     * @param positionOrder Il numero della posizione da assegnare.
+     */
     public void setPositionOrder(int positionOrder) { this.positionOrder = positionOrder; }
 
-    /** @return L'ID della bacheca contenitrice. */
+    /**
+     * Restituisce l'ID della bacheca che contiene il task.
+     *
+     * @return L'ID numerico della bacheca.
+     */
     public int getBoardId() { return boardId; }
-    /** @param boardId L'ID della bacheca a cui assegnare il task. */
+
+    /**
+     * Imposta la bacheca a cui assegnare il task.
+     *
+     * @param boardId L'ID numerico della bacheca contenitore.
+     */
     public void setBoardId(int boardId) { this.boardId = boardId; }
 
-    /** @return Il livello di priorità del task. */
+    /**
+     * Restituisce il livello di importanza del task.
+     *
+     * @return L'oggetto {@link Priority} assegnato.
+     */
     public Priority getPriority() { return priority; }
-    /** @param priority La priorità da assegnare. */
+
+    /**
+     * Imposta il livello di importanza del task.
+     *
+     * @param priority Il livello (ALTA, MEDIA, BASSA) da assegnare.
+     */
     public void setPriority(Priority priority) { this.priority = priority; }
 
-    /** @return Il ruolo dell'utente corrente rispetto al task (OWNER/SHARED). */
+    /**
+     * Restituisce il ruolo dell'utente che sta visualizzando il task.
+     *
+     * @return Il testo indicante il ruolo (es. "OWNER" o "SHARED").
+     */
     public String getRole() { return role; }
-    /** @param role Il ruolo da assegnare per la gestione dei permessi UI. */
+
+    /**
+     * Imposta il ruolo dell'utente per definire cosa può fare nell'interfaccia UI.
+     *
+     * @param role Il ruolo da assegnare (es. "OWNER").
+     */
     public void setRole(String role) { this.role = role; }
 
     /**
-     * Restituisce il titolo del task come rappresentazione testuale.
-     * @return Il titolo dell'attività.
+     * Restituisce il titolo del task quando l'oggetto viene convertito in testo.
+     * Utile per la stampa nei log o in componenti base di Swing.
+     *
+     * @return Il titolo del task.
      */
     @Override
     public String toString() {

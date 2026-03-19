@@ -10,37 +10,56 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * Gestisce le interazioni del mouse sulle card dei task, combinando la funzionalità
- * di trascinamento (Drag &amp; Drop) per il riordino con quella di click per l'apertura dei dettagli.
+ * Gestisce le interazioni del mouse applicate alle card dei task ({@link TaskCard}), coordinando
+ * la logica di trascinamento (Drag &amp; Drop) per il riordino visivo con la gestione dei click
+ * per l'apertura della visualizzazione dettagliata.
  * <p>
- * Questa classe implementa una logica per distinguere intenzionalmente tra:
+ * Implementa una strategia di filtraggio basata su una soglia di movimento ({@code DRAG_THRESHOLD})
+ * per differenziare intenzionalmente tra:
  * <ul>
- * <li><b>Click:</b> Pressione e rilascio senza movimento significativo (apre il task).</li>
- * <li><b>Drag:</b> Pressione, movimento oltre una soglia minima e rilascio (sposta il task).</li>
+ * <li><b>Click Sinistro:</b> Pressione e rilascio statico, adibito all'invocazione dei dettagli del task.</li>
+ * <li><b>Trascinamento (Drag):</b> Movimento dinamico del cursore che innesca il riposizionamento
+ * dinamico delle componenti nel contenitore.</li>
  * </ul>
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class TaskDragListener extends MouseAdapter {
 
+    /** Il pannello contenitore Swing che ospita la collezione ordinata di {@link TaskCard}. */
     private final JPanel container;
+
+    /** Il riferimento al Controller per la sincronizzazione dell'ordinamento nel database. */
     private final Controller controller;
+
+    /** La funzione di callback eseguita al termine di un'operazione di rilascio (Drop). */
     private final Runnable onDrop;
 
+    /** Il riferimento alla card attualmente oggetto dell'operazione di trascinamento. */
     private TaskCard draggingCard = null;
+
+    /** Il componente sorgente originale dell'evento (utilizzato per la conversione delle coordinate). */
     private Component originalSource = null;
 
-    // Variabili per la logica Click vs Drag
+    /** Il punto di coordinate iniziale acquisito al momento della pressione del mouse. */
     private Point initialClickPoint = null;
+
+    /** Flag di stato che indica se l'interazione corrente è stata classificata come trascinamento attivo. */
     private boolean isDraggingAction = false;
+
+    /** Soglia minima di spostamento in pixel necessaria per convertire un click in un drag. */
     private static final int DRAG_THRESHOLD = 5;
 
+    /** Flag di controllo per l'attivazione o la sospensione temporanea del listener. */
     private boolean enabled = true;
 
     /**
-     * Costruisce un nuovo listener per la gestione dei task.
+     * Inizializza il listener associandolo a un contenitore specifico e ai servizi di logica di business.
      *
-     * @param container  Il pannello Swing che contiene le {@link TaskCard}.
-     * @param controller Il {@link Controller} per eseguire gli aggiornamenti sul database.
-     * @param onDrop     Azione da eseguire dopo che un task è stato spostato e rilasciato.
+     * @param container  Il componente grafico {@link JPanel} che funge da genitore per i task.
+     * @param controller Il riferimento al gestore della persistenza e delle regole di dominio.
+     * @param onDrop     L'azione da eseguire per rinfrescare l'interfaccia dopo un riordinamento.
      */
     public TaskDragListener(JPanel container, Controller controller, Runnable onDrop) {
         this.container = container;
@@ -49,32 +68,33 @@ public class TaskDragListener extends MouseAdapter {
     }
 
     /**
-     * Imposta lo stato di attivazione del listener.
-     * Se disabilitato, ignora ogni tentativo di trascinamento.
+     * Modifica lo stato di operatività del listener.
+     * Se impostato su {@code false}, il listener neutralizza ogni tentativo di trascinamento
+     * pur mantenendo attive le altre risposte agli eventi del mouse.
      *
-     * @param enabled true per abilitare il drag, false per bloccarlo.
+     * @param enabled {@code true} per consentire le operazioni di drag; {@code false} per bloccarle.
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
     /**
-     * Gestisce l'evento di pressione del tasto del mouse.
-     * Interrompe immediatamente l'esecuzione se l'input non proviene dal tasto sinistro,
-     * garantendo che il tasto destro non attivi alcuna logica di selezione o trascinamento.
-     * Identifica la {@link TaskCard} coinvolta risalendo la gerarchia dei componenti
-     * e memorizza le coordinate iniziali dell'interazione.
+     * Intercetta la pressione del tasto del mouse per avviare il monitoraggio dell'interazione.
+     * Applica un filtro restrittivo sul tasto sinistro ({@code BUTTON1}) per evitare interferenze
+     * con i menu contestuali (tasto destro) e identifica la card coinvolta risalendo
+     * la gerarchia dei componenti.
      *
-     * @param e L'evento del mouse generato.
+     * @param e L'evento del mouse {@link MouseEvent} captato.
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        // FILTRO TASTO DESTRO: Se non è il tasto sinistro, interrompe subito
+        // Garantisce che solo l'input primario (tasto sinistro) attivi la logica di drag/click
         if (!SwingUtilities.isLeftMouseButton(e)) return;
 
         originalSource = e.getComponent();
         Component c = originalSource;
 
+        // Risale la gerarchia dei componenti per localizzare la TaskCard radice
         while (c != null && !(c instanceof TaskCard)) {
             c = c.getParent();
         }
@@ -87,21 +107,20 @@ public class TaskDragListener extends MouseAdapter {
     }
 
     /**
-     * Gestisce il movimento del mouse mentre il tasto è premuto.
-     * <p>
-     * Verifica se la distanza percorsa supera la soglia minima impostata.
-     * Se superata, attiva la modalità trascinamento (cambiando il cursore) e gestisce
-     * lo scambio visivo delle card all'interno del contenitore.
-     * Gestisce inoltre lo scorrimento automatico (auto-scroll) se il mouse raggiunge i bordi.
+     * Coordina lo spostamento dinamico dei componenti durante il trascinamento attivo.
+     * Valuta il superamento della soglia {@code DRAG_THRESHOLD} per attivare il feedback visivo
+     * (cambio cursore) e gestisce lo scambio di posizione delle card basandosi sulla
+     * proiezione verticale del cursore. Implementa inoltre una logica di auto-scrolling
+     * integrata con il {@link JViewport} genitore.
      *
-     * @param e L'evento del mouse generato.
+     * @param e L'evento di trascinamento {@link MouseEvent} captato.
      */
     @Override
     public void mouseDragged(MouseEvent e) {
         if (draggingCard == null || initialClickPoint == null) return;
-        if (!enabled) return; // Blocca il movimento
+        if (!enabled) return;
 
-        // Verifica della soglia minima di movimento per attivare il Drag
+        // Algoritmo di attivazione differita del Drag per prevenire click accidentali
         if (!isDraggingAction) {
             double distance = initialClickPoint.distance(e.getPoint());
             if (distance < DRAG_THRESHOLD) {
@@ -116,6 +135,7 @@ public class TaskDragListener extends MouseAdapter {
         Point p = SwingUtilities.convertPoint(originalSource, e.getPoint(), container);
         int currentY = p.y;
 
+        // Identifica il componente bersaglio situato alla coordinata Y attuale
         Component target = container.getComponentAt(container.getWidth() / 2, currentY);
 
         if (target instanceof TaskCard card && target != draggingCard) {
@@ -123,26 +143,23 @@ public class TaskDragListener extends MouseAdapter {
             int currentIndex = getCardIndex(draggingCard);
 
             if (targetIndex != -1 && currentIndex != -1) {
+                // Esegue lo swap visivo dei componenti nel layout
                 container.add(draggingCard, targetIndex);
                 container.revalidate();
                 container.repaint();
             }
         }
 
-        // Gestisce lo scorrimento automatico solo ai limiti dell'area visibile.
-        // Lascia libera la rotella del mouse di funzionare fluidamente durante il drag.
+        // Gestione dell'auto-scrolling basata sui margini sensibili del JViewport
         if (container.getParent() instanceof JViewport viewport) {
             Rectangle viewRect = viewport.getViewRect();
-            int scrollMargin = 25; // Zona di tolleranza in pixel (bordo superiore e inferiore)
-
+            int scrollMargin = 25;
             int scrollStep = 12;
 
-            // Sposta la vista verso l'alto se il cursore tocca il margine superiore
             if (p.y < viewRect.y + scrollMargin) {
                 viewRect.y = Math.max(0, viewRect.y - scrollStep);
                 container.scrollRectToVisible(viewRect);
             }
-            // Sposta la vista verso il basso se il cursore tocca il margine inferiore
             else if (p.y > viewRect.y + viewRect.height - scrollMargin) {
                 viewRect.y = Math.min(container.getHeight() - viewRect.height, viewRect.y + scrollStep);
                 container.scrollRectToVisible(viewRect);
@@ -151,26 +168,23 @@ public class TaskDragListener extends MouseAdapter {
     }
 
     /**
-     * Gestisce l'evento di rilascio del tasto del mouse.
-     * Valuta se l'interazione conclusa rappresenta un semplice click o il termine
-     * di un trascinamento. In caso di click sinistro autentico, richiede l'apertura
-     * del dialogo dei dettagli; in caso di trascinamento, finalizza il riposizionamento
-     * visivo e aggiorna l'ordinamento persistente nel database.
-     * Infine, esegue il reset completo dello stato interno del listener.
+     * Finalizza l'interazione del mouse discriminando l'esito finale dell'azione.
+     * Se l'azione non ha superato la soglia di drag, interpreta l'evento come un click
+     * e richiede l'apertura del dialogo di dettaglio. Se l'azione era un drag, ripristina
+     * i cursori standard e richiede la persistenza del nuovo ordinamento nel database.
      *
-     * @param e L'evento del mouse generato.
+     * @param e L'evento di rilascio {@link MouseEvent} captato.
      */
     @Override
     public void mouseReleased(MouseEvent e) {
-        // Se draggingCard è null, significa che mousePressed ha ignorato l'evento (es. tasto destro)
         if (draggingCard != null) {
             if (!isDraggingAction) {
-                // Esegue il controllo finale sul tasto per sicurezza prima di aprire i dettagli
+                // Caso: Click semplice (invocazione visualizzazione dettagliata)
                 if (SwingUtilities.isLeftMouseButton(e)) {
                     draggingCard.openDetails();
                 }
             } else {
-                // Finalizza l'operazione di trascinamento
+                // Caso: Fine trascinamento (consolidamento dell'ordine)
                 container.setCursor(Cursor.getDefaultCursor());
                 draggingCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
@@ -180,7 +194,7 @@ public class TaskDragListener extends MouseAdapter {
             }
         }
 
-        // Esegue il reset dello stato per prepararsi alla prossima interazione
+        // Reset rigoroso dello stato interno per la gestione del ciclo di vita dell'evento
         draggingCard = null;
         originalSource = null;
         isDraggingAction = false;
@@ -188,10 +202,11 @@ public class TaskDragListener extends MouseAdapter {
     }
 
     /**
-     * Recupera l'indice attuale di una card all'interno del contenitore.
+     * Identifica la posizione ordinale di una card all'interno del contenitore.
      *
-     * @param card La card di cui cercare l'indice.
-     * @return L'indice (0-based) o {@code -1} se la card non è trovata.
+     * @param card L'istanza di {@link TaskCard} di cui determinare l'indice.
+     * @return L'indice posizionale (0-based) nell'albero dei componenti,
+     * o {@code -1} se la card non risulta presente nel contenitore.
      */
     private int getCardIndex(TaskCard card) {
         for (int i = 0; i < container.getComponentCount(); i++) {
@@ -201,10 +216,10 @@ public class TaskDragListener extends MouseAdapter {
     }
 
     /**
-     * Aggiorna le posizioni nel database rispecchiando l'ordine visivo corrente.
-     * <p>
-     * Itera sui componenti e aggiorna il campo posizione nel database solo se
-     * differisce dal valore attuale, ottimizzando le performance delle query.
+     * Sincronizza l'ordinamento visivo delle componenti con la persistenza sul database.
+     * Itera sulla collezione di componenti presenti nel contenitore e inoltra
+     * al controller le richieste di aggiornamento solo per i task la cui posizione
+     * relativa ha subito una variazione effettiva.
      */
     private void updatePositionsInDB() {
         int positionCounter = 1;
@@ -214,6 +229,7 @@ public class TaskDragListener extends MouseAdapter {
             if (c instanceof TaskCard card) {
                 ToDo todo = card.getTodo();
 
+                // Ottimizzazione: aggiorna solo se la posizione logica è variata
                 if (todo.getPositionOrder() != positionCounter) {
                     boolean success = controller.updateTodoPosition(todo.getId(), positionCounter, todo.getRole());
                     if (success) {

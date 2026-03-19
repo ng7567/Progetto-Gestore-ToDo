@@ -11,6 +11,8 @@ import java.util.List;
  * Incapsula tutti i parametri necessari alla creazione di un nuovo ToDo.
  * Utilizzato per ridurre la complessità delle firme dei metodi nel Controller e nel DAO.
  *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  * @param boardId         L'identificativo della bacheca di appartenenza.
  * @param title           Il titolo testuale del task.
  * @param description     La descrizione dettagliata del task.

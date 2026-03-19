@@ -4,24 +4,35 @@ import java.util.Objects;
 
 /**
  * Rappresenta l'entità bacheca (Board) all'interno del sistema.
- * Gestisce i dati relativi al contenitore dei task, mantenendo il riferimento
- * univoco all'utente proprietario e fornendo i metodi per la manipolazione
- * degli attributi testuali.
+ * Contiene i dati relativi al raggruppamento dei task, mantiene il collegamento
+ * con l'utente creatore e fornisce i metodi necessari per leggere o modificare
+ * le sue informazioni principali.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class Board {
+
+    /** Il codice numerico univoco generato dal database per identificare la bacheca. */
     private int id;
+
+    /** Il nome assegnato alla bacheca. */
     private String title;
+
+    /** Il testo aggiuntivo che descrive lo scopo o il contenuto della bacheca. */
     private String description;
+
+    /** Il codice numerico dell'utente che ha creato la bacheca. */
     private final int userId;
 
     /**
-     * Costruisce una nuova bacheca destinata all'inserimento nel database.
-     * L'identificativo viene omesso poiché la sua generazione è delegata
-     * al sistema di persistenza (chiave seriale).
+     * Crea una nuova bacheca pronta per essere salvata nel database.
+     * L'ID non viene richiesto perché sarà assegnato automaticamente dal sistema
+     * al momento del salvataggio.
      *
-     * @param title       Il titolo testuale della bacheca.
-     * @param description La descrizione estesa del contenuto.
-     * @param userId      L'identificativo univoco dell'utente proprietario.
+     * @param title       Il nome della bacheca.
+     * @param description Le informazioni aggiuntive sul contenuto.
+     * @param userId      Il codice dell'utente creatore.
      */
     public Board(String title, String description, int userId) {
         this.title = title;
@@ -30,12 +41,12 @@ public class Board {
     }
 
     /**
-     * Costruisce un oggetto Board completo includendo i dati recuperati dal database.
+     * Crea un oggetto Board completo usando i dati letti dal database.
      *
-     * @param id          L'identificativo univoco della bacheca.
-     * @param title       Il titolo testuale della bacheca.
-     * @param description La descrizione estesa del contenuto.
-     * @param userId      L'identificativo univoco dell'utente proprietario.
+     * @param id          Il codice numerico univoco della bacheca.
+     * @param title       Il nome della bacheca.
+     * @param description Le informazioni aggiuntive sul contenuto.
+     * @param userId      Il codice dell'utente creatore.
      */
     public Board(int id, String title, String description, int userId) {
         this.id = id;
@@ -45,74 +56,74 @@ public class Board {
     }
 
     /**
-     * Restituisce l'identificativo univoco della bacheca.
+     * Legge il codice identificativo della bacheca.
      *
-     * @return L'ID numerico della bacheca.
+     * @return L'ID numerico associato al record.
      */
     public int getId() {
         return id;
     }
 
     /**
-     * Imposta l'identificativo univoco della bacheca.
+     * Modifica il codice identificativo della bacheca.
      *
-     * @param id L'ID numerico da assegnare al record.
+     * @param id Il nuovo ID numerico da assegnare.
      */
     public void setId(int id) {
         this.id = id;
     }
 
     /**
-     * Restituisce il titolo della bacheca.
+     * Legge il nome della bacheca.
      *
-     * @return La stringa contenente il titolo.
+     * @return La stringa che contiene il titolo.
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     * Aggiorna il titolo della bacheca.
+     * Sostituisce il nome della bacheca con uno nuovo.
      *
-     * @param title Il nuovo titolo testuale da assegnare.
+     * @param title Il nuovo nome da assegnare.
      */
     public void setTitle(String title) {
         this.title = title;
     }
 
     /**
-     * Restituisce l'identificativo dell'utente proprietario della bacheca.
+     * Legge il codice dell'utente che ha creato la bacheca.
      *
-     * @return L'ID dell'utente a cui è associata la bacheca.
+     * @return L'ID numerico dell'utente creatore.
      */
     public int getUserId() {
         return userId;
     }
 
     /**
-     * Restituisce la descrizione estesa della bacheca.
+     * Legge le informazioni aggiuntive della bacheca.
      *
-     * @return La stringa contenente la descrizione, o {@code null} se non presente.
+     * @return La stringa con la descrizione, o {@code null} se non è stata inserita.
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * Aggiorna la descrizione della bacheca.
+     * Sostituisce le informazioni aggiuntive della bacheca con un nuovo testo.
      *
-     * @param description La nuova descrizione testuale da assegnare.
+     * @param description Il nuovo testo da assegnare.
      */
     public void setDescription(String description) {
         this.description = description;
     }
 
     /**
-     * Fornisce una rappresentazione testuale dell'oggetto.
-     * Restituisce il titolo per facilitare il rendering automatico nei componenti
-     * grafici di tipo lista o menu a tendina.
+     * Restituisce una rappresentazione testuale dell'oggetto.
+     * Mostra direttamente il nome della bacheca, facilitando la sua visualizzazione
+     * automatica all'interno di liste o menu a tendina nell'interfaccia grafica.
      *
-     * @return Il titolo della bacheca.
+     * @return Il nome della bacheca.
      */
     @Override
     public String toString() {
@@ -120,11 +131,11 @@ public class Board {
     }
 
     /**
-     * Confronta la bacheca corrente con un altro oggetto per verificarne l'uguaglianza.
-     * La verifica si basa esclusivamente sulla corrispondenza dell'ID univoco.
+     * Confronta la bacheca con un altro oggetto per capire se sono uguali.
+     * Due bacheche sono considerate identiche se hanno lo stesso ID numerico.
      *
-     * @param o L'oggetto da confrontare con l'istanza corrente.
-     * @return {@code true} se gli ID coincidono, {@code false} altrimenti.
+     * @param o L'oggetto da confrontare.
+     * @return {@code true} se gli oggetti sono uguali, {@code false} altrimenti.
      */
     @Override
     public boolean equals(Object o) {
@@ -135,10 +146,11 @@ public class Board {
     }
 
     /**
-     * Calcola il codice hash univoco per l'istanza della bacheca.
-     * Il valore è generato a partire dall'identificativo numerico.
+     * Genera un codice numerico (hash) per la bacheca.
+     * Il calcolo si basa unicamente sul suo ID univoco per garantire coerenza
+     * con il metodo {@link #equals(Object)}.
      *
-     * @return Il valore intero rappresentante l'hash code.
+     * @return Il valore hash calcolato.
      */
     @Override
     public int hashCode() {

@@ -25,76 +25,123 @@ import javax.imageio.ImageIO;
 import util.FileUtils;
 
 /**
- * Finestra di dialogo per la visualizzazione e la modifica dettagliata di un Task.
- * <p>
- * Questa classe gestisce un form complesso che include:
- * <ul>
- * <li>Titolo e Descrizione modificabili.</li>
- * <li>Stato di completamento.</li>
- * <li>Scadenza (Data e Ora).</li>
- * <li>Priorità e Link URL.</li>
- * <li>Gestione collaboratori (Aggiunta/Rimozione).</li>
- * <li>Gestione allegati immagine (Preview e Caricamento).</li>
- * <li>Personalizzazione del colore della scheda.</li>
- * </ul>
- * Implementa anche un sistema di "Snapshot" per rilevare modifiche non salvate alla chiusura.
+ * Rappresenta la finestra di dialogo modale adibita alla visualizzazione e alla modifica
+ * di un singolo Task.
+ * Gestisce un'interfaccia che integra la manipolazione dei metadati testuali,
+ * il controllo temporale delle scadenze, la gestione delle relazioni di collaborazione e
+ * l'elaborazione di allegati multimediali. Implementa un sistema per il
+ * monitoraggio dello stato di modifica, garantendo l'integrità dei dati tramite avvisi
+ * di conferma alla chiusura in caso di variazioni non consolidate.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class TodoDetailsDialog extends JDialog {
 
+    /** Altezza predefinita espressa in pixel per i componenti di input standard della sidebar. */
     private static final int COMPONENT_HEIGHT = 30;
 
+    /** Il riferimento all'entità di dominio ToDo correntemente soggetta a ispezione o modifica. */
     private final transient ToDo todo;
+
+    /** Il riferimento al Controller per l'esecuzione delle operazioni di persistenza e business logic. */
     private final transient Controller controller;
 
+    /** Costante testuale utilizzata come intestazione per i messaggi di errore critico. */
     private static final String ERROR = "Errore";
 
-    // Snapshot per rilevare modifiche
+    // --- Monitoraggio delle modifiche ---
+
+    /** Copia di sicurezza del titolo originale al momento dell'apertura del dialogo. */
     private final String initTitle;
+
+    /** Copia di sicurezza della descrizione originale. */
     private final String initDescription;
+
+    /** Copia di sicurezza dello stato di completamento originale. */
     private final boolean initCompleted;
+
+    /** Copia di sicurezza della data di scadenza originale. */
     private final Date initExpiryDate;
+
+    /** Copia di sicurezza del livello di priorità originale. */
     private final Priority initPriority;
+
+    /** Copia di sicurezza del collegamento URL originale. */
     private final String initUrl;
+
+    /** Copia di sicurezza del percorso del file immagine originale. */
     private final String initImagePath;
+
+    /** Copia di sicurezza del codice esadecimale del colore di sfondo originale. */
     private final String initBackgroundColor;
+
+    /** Copia di sicurezza dell'elenco dei collaboratori originale. */
     private final List<String> initCollaborators;
 
-    // Componenti UI
+    // --- Componenti UI ---
+
+    /** Il pannello principale che funge da radice per l'intera gerarchia grafica del dialogo. */
     private JPanel mainPanel;
+
+    /** Il campo di testo per l'editing del titolo del task. */
     private JTextField txtTitle;
+
+    /** L'area di testo multi-riga per l'editing della descrizione. */
     private JTextArea txtDescription;
+
+    /** Il pannello di scorrimento stilizzato che incapsula l'area della descrizione. */
     private JScrollPane scrollDesc;
+
+    /** La casella di controllo per l'aggiornamento dello stato di completamento. */
     private JCheckBox chkCompleted;
 
-    // Data e Ora
+    // --- Data e Ora ---
+
+    /** Il componente grafico a calendario per la selezione della data di scadenza. */
     private JDateChooser dateChooser;
+
+    /** Il selettore numerico a rotazione per l'impostazione fine dell'orario di scadenza. */
     private JSpinner timeSpinner;
 
+    /** Il menu a tendina per la selezione della priorità. */
     private JComboBox<Priority> cmbPriority;
+
+    /** Il campo di testo per l'inserimento o la modifica dell'URL ipertestuale. */
     private JTextField txtUrl;
+
+    /** Il pannello di anteprima cromatica che riflette il colore di sfondo scelto. */
     private JPanel colorPreviewPanel;
+
+    /** Il valore esadecimale del colore di sfondo attualmente selezionato dall'utente. */
     private String selectedColorHex;
 
-    // Gestione Immagini
+    // --- Gestione Immagini ---
+
+    /** L'etichetta utilizzata per visualizzare l'anteprima scalata dell'immagine allegata. */
     private JLabel lblImagePreview;
+
+    /** Il pulsante deputato alla rimozione logica e fisica dell'allegato immagine. */
     private JButton btnRemoveImage;
+
+    /** Il percorso assoluto o relativo dell'immagine correntemente visualizzata nell'anteprima. */
     private String currentImagePath;
 
-    // Flag per finestre secondarie
+    /** Flag di controllo per inibire la chiusura accidentale del dialogo durante l'uso di selettori secondari. */
     private boolean isSubDialogActive = false;
 
-    // Callback
+    /** La funzione di callback da eseguire in seguito a operazioni di salvataggio o eliminazione. */
     private final transient Runnable onUpdateListener;
 
     /**
-     * Costruisce il dialogo di dettaglio per un task specifico.
-     * Salva immediatamente uno snapshot dello stato attuale del {@link ToDo} per gestire
-     * il controllo delle modifiche non salvate al momento della chiusura.
+     * Inizializza il dialogo di dettaglio eseguendo contestualmente lo snapshot dello stato
+     * attuale dell'oggetto {@link ToDo}. Configura i listener di chiusura per intercettare
+     * variazioni non salvate e gestisce l'oscuramento della finestra madre.
      *
-     * @param owner            La finestra proprietaria (utilizzata per centrare il dialogo).
-     * @param controller       Il controller per l'interazione con il database.
-     * @param todo             L'oggetto {@link ToDo} da visualizzare e modificare.
-     * @param onUpdateListener La callback eseguita in caso di salvataggio o eliminazione avvenuti con successo.
+     * @param owner            La finestra proprietaria ({@link Window}) per il posizionamento e la modalit&agrave;.
+     * @param controller       Il riferimento al gestore della logica di business.
+     * @param todo             L'istanza del task da analizzare.
+     * @param onUpdateListener La callback per notificare i cambiamenti al frame principale.
      */
     public TodoDetailsDialog(Window owner, Controller controller, ToDo todo, Runnable onUpdateListener) {
         super(owner, "Dettagli Task");
@@ -102,7 +149,7 @@ public class TodoDetailsDialog extends JDialog {
         this.todo = todo;
         this.onUpdateListener = onUpdateListener;
 
-        // Salvataggio stato iniziale
+        // Inizializzazione dello stato di sicurezza per il rollback o la conferma
         this.initTitle = todo.getTitle() == null ? "" : todo.getTitle();
         this.initDescription = todo.getDescription() == null ? "" : todo.getDescription();
         this.initCompleted = todo.isCompleted();
@@ -113,11 +160,9 @@ public class TodoDetailsDialog extends JDialog {
         this.initBackgroundColor = todo.getBackgroundColor();
         this.initCollaborators = new ArrayList<>(todo.getCollaborators());
 
-        // Stato corrente modificabile
         this.selectedColorHex = todo.getBackgroundColor();
         this.currentImagePath = todo.getImagePath();
 
-        // Configurazione chiusura finestra
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -128,7 +173,6 @@ public class TodoDetailsDialog extends JDialog {
 
         initUI();
 
-        // Gestione Overlay
         if (owner instanceof BoardFrame boardFrame) {
             boardFrame.showOverlay(true, this::attemptClose);
         }
@@ -138,9 +182,9 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Tenta la chiusura della finestra di dialogo.
-     * Verifica la presenza di modifiche non salvate tramite lo snapshot e, in caso affermativo,
-     * richiede una conferma esplicita all'utente prima di scartarle.
+     * Controlla la chiusura del dialogo.
+     * Verifica la divergenza tra lo stato attuale dei componenti UI e lo stato iniziale;
+     * in caso di modifiche effettuate, richiede un'ulteriore conferma all'utente.
      */
     private void attemptClose() {
         if (isSubDialogActive) return;
@@ -150,7 +194,6 @@ public class TodoDetailsDialog extends JDialog {
             String msg = "Hai modifiche non salvate.\nSei sicuro di voler annullare?";
 
             if (GuiUtils.showConfirmDialog(this, msg, "Conferma Chiusura", JOptionPane.WARNING_MESSAGE)) {
-                // Ripristina i collaboratori nel caso siano stati modificati live nella lista
                 todo.setCollaborators(new ArrayList<>(initCollaborators));
                 closeDialog();
             }
@@ -160,8 +203,8 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Chiude definitivamente il dialogo corrente.
-     * Rimuove l'overlay di oscuramento dalla finestra madre, se presente, e distrugge le risorse grafiche.
+     * Finalizza la chiusura della finestra di dialogo.
+     * Provvede alla disattivazione dell'overlay grafico sulla finestra madre prima di rilasciare le risorse.
      */
     private void closeDialog() {
         Window owner = getOwner();
@@ -172,9 +215,14 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Confronta i valori attualmente inseriti nei componenti UI con lo snapshot iniziale.
+     * Esegue un controllo comparativo tra i valori correnti presenti nei componenti
+     * dell'interfaccia utente e lo stato memorizzato nello snapshot iniziale.
+     * Questa verifica permette di determinare se il task ha subito mutazioni
+     * e di prevenire la perdita accidentale di dati durante la chiusura del dialog.
      *
-     * @return {@code true} se rileva una qualsiasi modifica ai campi o allo stato, {@code false} altrimenti.
+     * @return {@code true} se viene rilevata una discrepanza logica in uno qualsiasi
+     * dei campi monitorati; {@code false} se lo stato dell'UI coincide
+     * perfettamente con i dati originali.
      */
     private boolean hasUnsavedChanges() {
         if (stringsDifferent(initTitle, txtTitle.getText())) return true;
@@ -194,11 +242,15 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Verifica se due stringhe di testo differiscono, ignorando gli spazi bianchi laterali e i valori nulli.
+     * Valuta se due stringhe di testo presentano contenuti logici differenti, normalizzandole
+     * tramite la rimozione degli spazi bianchi iniziali e finali.
+     * Il metodo gestisce in sicurezza i valori {@code null}, trattandoli come stringhe vuote
+     * per evitare eccezioni di tipo {@link NullPointerException}.
      *
-     * @param s1 La prima stringa da confrontare.
-     * @param s2 La seconda stringa da confrontare.
-     * @return {@code true} se le stringhe contengono un valore logico differente.
+     * @param s1 Il primo riferimento testuale da sottoporre a confronto.
+     * @param s2 Il secondo riferimento testuale da sottoporre a confronto.
+     * @return {@code true} se le stringhe, una volta normalizzate, risultano diverse;
+     * {@code false} se i contenuti logici sono identici.
      */
     private boolean stringsDifferent(String s1, String s2) {
         String safe1 = s1 == null ? "" : s1.trim();
@@ -207,11 +259,17 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Verifica se due oggetti Date differiscono di almeno un secondo logico.
+     * Esegue una comparazione temporale tra due oggetti {@link Date} applicando una tolleranza
+     * di un secondo (1000 millisecondi).
+     * Tale scostamento è necessario per ovviare alle diverse risoluzioni temporali dei
+     * database rispetto alla precisione del sistema Java,
+     * garantendo che discrepanze inferiori al secondo non vengano interpretate come modifiche utente.
      *
-     * @param d1 La prima data.
-     * @param d2 La seconda data.
-     * @return {@code true} se le date sono diverse in maniera significativa.
+     * @param d1 Il primo riferimento temporale da confrontare.
+     * @param d2 Il secondo riferimento temporale da confrontare.
+     * @return {@code true} se la differenza tra le due date è pari o superiore a un secondo
+     * o se solo una delle due è {@code null}; {@code false} se le date coincidono
+     * entro il margine di tolleranza o sono entrambe {@code null}.
      */
     private boolean areDatesEqual(Date d1, Date d2) {
         if (d1 == null && d2 == null) return false;
@@ -221,9 +279,9 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Estrae e combina i valori di data e ora dagli appositi componenti dell'interfaccia utente.
+     * Recupera l'unione dei valori logici impostati nei selettori di data e ora.
      *
-     * @return L'oggetto {@link Date} completo combinato, o {@code null} se l'utente non ha impostato alcuna data.
+     * @return Un oggetto {@link Date} normalizzato, o {@code null} se la data non è specificata.
      */
     private Date getDateFromUI() {
         Date date = dateChooser.getDate();
@@ -235,12 +293,12 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Unisce la componente di data di un oggetto Date con la componente oraria di un altro.
-     * Azzera preventivamente i secondi e i millisecondi per evitare asimmetrie nel database.
+     * Sincronizza i campi anno/mese/giorno di una data con ore/minuti di un'altra.
+     * Azzera proattivamente i millisecondi per garantire la coerenza dei confronti.
      *
-     * @param date La data sorgente (giorno/mese/anno).
-     * @param time Il riferimento orario sorgente (ore/minuti).
-     * @return L'istanza combinata risultante.
+     * @param date Riferimento per la data.
+     * @param time Riferimento per l'orario.
+     * @return L'istanza temporale consolidata.
      */
     private Date getCombinedDateTime(Date date, Date time) {
         Calendar calDate = Calendar.getInstance();
@@ -255,8 +313,8 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Inizializza l'interfaccia utente costruendo il layout strutturato a due colonne.
-     * Posiziona i campi testuali principali a sinistra e i pannelli delle opzioni aggiuntive a destra.
+     * Struttura gerarchicamente l'interfaccia utente costruendo un layout a due colonne (Main/Sidebar).
+     * Alloca i controlli principali a sinistra e le opzioni di configurazione secondaria nel pannello laterale.
      */
     private void initUI() {
         mainPanel = new JPanel(new GridBagLayout());
@@ -378,9 +436,8 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Applica il colore di sfondo selezionato all'intero pannello.
-     * Calcola dinamicamente il colore in contrasto per aggiornare la tinta dei testi
-     * e garantire sempre un'ottima leggibilità.
+     * Applica dinamicamente il colore di sfondo selezionato e ricalcola proattivamente
+     * il contrasto per i componenti testuali onde garantire l'accessibilità visiva.
      */
     private void applyBackgroundColor() {
         Color bg;
@@ -411,9 +468,9 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Aggiorna lo stile cromatico del componente di testo dedicato alla descrizione.
+     * Aggiorna lo stile del modulo descrittivo (area di testo e bordi del pannello).
      *
-     * @param color Il colore dinamico da applicare al font e ai bordi.
+     * @param color Il colore dinamico calcolato per il contrasto.
      */
     private void updateDescriptionStyle(Color color) {
         if (txtDescription != null) {
@@ -433,9 +490,9 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Sostituisce il bordo inferiore del campo titolo con il colore specificato.
+     * Modifica l'estetica del bordo inferiore del campo titolo per riflettere il tema.
      *
-     * @param borderColor Il colore da assegnare alla linea inferiore del campo testuale.
+     * @param borderColor Il colore da applicare alla linea di sottolineatura del titolo.
      */
     private void updateTitleBorder(Color borderColor) {
         if (txtTitle != null) {
@@ -447,12 +504,12 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Aggiunge una nuova sezione tematica alla sidebar laterale del dialogo.
-     * Fornisce un'etichetta di formattazione standard al componente passato come parametro.
+     * Aggrega una nuova sezione informativa alla sidebar, formattandone l'etichetta
+     * e vincolando le dimensioni dei componenti interattivi.
      *
-     * @param container Il contenitore genitore in cui inserire la sezione.
-     * @param title     Il titolo descrittivo della sezione.
-     * @param component Il componente interattivo da abbinare al titolo.
+     * @param container Il pannello sidebar di destinazione.
+     * @param title     Il titolo testuale della sezione.
+     * @param component Il componente grafico da aggiungere.
      */
     private void addSidebarSection(JPanel container, String title, JComponent component) {
         JLabel lbl = new JLabel(title);
@@ -469,9 +526,9 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Configura il pannello orizzontale per la selezione della data e dell'orario di scadenza.
+     * Istanzia il pannello composito deputato alla selezione della data e dell'orario di scadenza.
      *
-     * @return Il {@link JComponent} composito pronto per l'inserimento nell'interfaccia.
+     * @return Il componente grafico pronto per l'integrazione sidebar.
      */
     private JComponent createDatePanel() {
         GuiUtils.DateTimePicker picker = GuiUtils.createDateTimePicker(todo.getExpiryDate());
@@ -494,9 +551,9 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Crea il selettore a discesa per l'impostazione della priorità del task.
+     * Inizializza il selettore dropdown per la priorità, sincronizzandolo con lo stato attuale del task.
      *
-     * @return Il componente {@link JComboBox} stilizzato e preimpostato.
+     * @return L'oggetto {@link JComboBox} configurato.
      */
     private JComponent createPriorityPanel() {
         cmbPriority = new JComboBox<>(Priority.values());
@@ -506,9 +563,9 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Crea il pannello per la gestione degli URL allegati, corredato di pulsante di reindirizzamento al browser.
+     * Istanzia il modulo di gestione degli URL, includendo un'azione di apertura nativa nel browser.
      *
-     * @return Il pannello configurato contenente campo testuale e pulsante azione.
+     * @return Il pannello di input stilizzato.
      */
     private JComponent createUrlPanel() {
         JPanel p = new JPanel(new BorderLayout(5, 0));
@@ -516,7 +573,6 @@ public class TodoDetailsDialog extends JDialog {
         p.setMaximumSize(new Dimension(Integer.MAX_VALUE, COMPONENT_HEIGHT));
 
         txtUrl = new JTextField(todo.getUrlLink());
-
         txtUrl.setPreferredSize(new Dimension(100, COMPONENT_HEIGHT));
         txtUrl.setMinimumSize(new Dimension(50, COMPONENT_HEIGHT));
 
@@ -541,9 +597,9 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Crea la sezione riassuntiva per mostrare lo stato di condivisione del task attuale.
+     * Costruisce la sezione informativa riassuntiva relativa ai membri e alla paternità del task.
      *
-     * @return Il pannello grafico aggiornato in base ai permessi dell'utente corrente.
+     * @return Un componente grafico che riassume lo stato delle condivisioni.
      */
     private JComponent createCollaboratorsPanel() {
         JPanel p = new JPanel(new BorderLayout());
@@ -603,9 +659,10 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Crea il riquadro destinato al caricamento, alla rimozione e alla visualizzazione dell'anteprima dell'immagine.
+     * Istanzia il modulo dedicato alla gestione degli allegati immagine, configurando
+     * le anteprime scalate e i gestori per il caricamento o la rimozione.
      *
-     * @return Il pannello di controllo completo per gli allegati multimediali.
+     * @return Il pannello di controllo multimediale.
      */
     private JComponent createImagePanel() {
         JPanel rootPanel = new JPanel(new BorderLayout(0, 5));
@@ -664,8 +721,8 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Aggiorna graficamente il contenitore dell'anteprima dell'immagine nella sidebar.
-     * Attiva o disattiva i controlli correlati in base all'effettiva presenza di un file.
+     * Esegue il rinfresco grafico dell'etichetta anteprima, gestendo gli stati di errore
+     * o l'assenza di allegati in modo da fornire un feedback testuale coerente.
      */
     private void updateImagePreview() {
         lblImagePreview.setIcon(null);
@@ -690,9 +747,10 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Tenta di localizzare, leggere e ridimensionare il file immagine associato al percorso corrente.
+     * Tenta la decodifica e il ridimensionamento smooth dell'immagine a partire
+     * dal percorso memorizzato, gestendo i fallback sui percorsi relativi.
      *
-     * @return {@code true} se l'operazione di decodifica va a buon fine, {@code false} in caso di disco non raggiungibile o file corrotto.
+     * @return {@code true} se il caricamento e la scalatura dell'icona hanno successo.
      */
     private boolean loadIconFromFile() {
         try {
@@ -719,7 +777,8 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Istanzia una nuova finestra di dialogo a schermo intero dedicata alla visualizzazione dell'immagine.
+     * Istanzia un visualizzatore modale a schermo intero per l'ispezione dell'allegato immagine
+     * a risoluzione nativa, integrando il supporto allo scorrimento.
      */
     private void showFullSizeImage() {
         if (currentImagePath == null) return;
@@ -754,9 +813,9 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Crea il pulsante di selezione visiva per la scelta del colore di sfondo.
+     * Inizializza il pannello interattivo per la scelta del colore di sfondo della scheda.
      *
-     * @return Il pannello interattivo che lancia il color chooser di sistema.
+     * @return Il componente cliccabile che innesca il selettore di colori di sistema.
      */
     private JComponent createColorPanel() {
         colorPreviewPanel = new JPanel();
@@ -788,9 +847,10 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Apre il modulo di gestione dedicato per consultare ed eventualmente aggiungere/rimuovere i collaboratori.
+     * Apre il modulo di gestione gerarchico per i collaboratori. Consente l'aggiunta o l'estromissione
+     * di membri dalla lista di condivisione a seconda dei permessi di proprietà posseduti dall'utente.
      *
-     * @param canEdit Flag che stabilisce se l'utente corrente possiede i diritti amministrativi sul task.
+     * @param canEdit Variabile booleana che stabilisce se l'utente possiede i diritti di modifica (Ruolo OWNER).
      */
     private void openCollaboratorManager(boolean canEdit) {
         JDialog dialog = new JDialog(this, "Collaboratori", true);
@@ -836,10 +896,10 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Compone l'intestazione testuale indicando la paternità del task nel gestore dei collaboratori.
+     * Struttura l'intestazione informativa del gestore collaboratori evidenziando l'attuale creatore del task.
      *
-     * @param canEdit Flag amministrativo derivato dal proprietario della risorsa.
-     * @return Il pannello destinato al titolo di appartenenza.
+     * @param canEdit Flag amministrativo.
+     * @return Il pannello informativo superiore.
      */
     private JPanel createCollaboratorsHeader(boolean canEdit) {
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -856,13 +916,13 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Costruisce il pannello dei comandi per aggiungere ed estromettere gli utenti dalla lista.
+     * Costruisce il pannello dei comandi per la mutazione della lista dei collaboratori (Aggiunta/Rimozione).
      *
-     * @param dialog      Il dialogo padre che gestisce la ricerca.
+     * @param dialog      La finestra modale di riferimento.
      * @param list        La componente visuale della JList.
-     * @param listModel   Il modello di dati su cui operare.
-     * @param currentUser L'username di colui che compie l'azione.
-     * @return Il pannello coi tasti azione (Aggiungi/Rimuovi).
+     * @param listModel   Il modello dei dati manipolato.
+     * @param currentUser L'username del visualizzatore corrente.
+     * @return Il pannello operativo configurato.
      */
     private JPanel createCollaboratorsEditPanel(JDialog dialog, JList<String> list, DefaultListModel<String> listModel, String currentUser) {
         JPanel btnPanel = new JPanel(new GridLayout(1, 2, 10, 0));
@@ -903,9 +963,9 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Coordina le fasi necessarie al salvataggio definitivo delle modifiche al task.
-     * Attiva le funzioni di convalida per prevenire corruzioni, consolida lo stato sul modello
-     * locale e delega l'invio finale della transazione logica al database.
+     * Coordina le fasi finali per la persistenza delle modifiche. Esegue la convalida dell'input,
+     * consolida lo stato sul modello locale, gestisce la sincronizzazione dei file immagine
+     * e demanda l'operazione di aggiornamento al database.
      */
     private void saveAction() {
         String newTitle = txtTitle.getText().trim();
@@ -921,13 +981,11 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Ispeziona i valori di input principali per stabilirne l'idoneità rispetto alle regole.
-     * Garantisce che il titolo inserito rispetti i limiti di lunghezza del database (varchar)
-     * e valuta la coerenza temporale dell'eventuale scadenza, interrompendo precocemente il flusso in caso di scarto.
+     * Valuta l'integrità e la coerenza dei dati immessi rispetto ai requisiti di sistema.
      *
-     * @param title    Il nuovo testo suggerito come titolo.
-     * @param expiryTs La scadenza calcolata in oggetto Timestamp.
-     * @return {@code true} se non vengono intercettati difetti formali, {@code false} se si evidenziano violazioni logiche.
+     * @param title    Il titolo suggerito per il task.
+     * @param expiryTs L'oggetto Timestamp della scadenza.
+     * @return {@code true} se i dati sono considerati validi e conformi.
      */
     private boolean isInputValid(String title, Timestamp expiryTs) {
         if (title.isEmpty()) {
@@ -950,11 +1008,11 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Scrive i dati convalidati prelevati dai controlli dell'interfaccia utente nei campi interni del modello ToDo.
-     * Allinea integralmente lo stato logico della classe con le istruzioni espresse dall'utente prima dell'archiviazione.
+     * Trasferisce i dati convalidati prelevati dall'interfaccia utente all'interno
+     * dello stato dell'entità ToDo correntemente gestita.
      *
      * @param title    Il titolo consolidato.
-     * @param expiryTs La scadenza calcolata consolidata.
+     * @param expiryTs La data di scadenza consolidata.
      */
     private void updateTodoModel(String title, Timestamp expiryTs) {
         todo.setTitle(title);
@@ -967,9 +1025,9 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Esegue il dialogo a livello applicativo con la risorsa database tramite il controller.
-     * Implementa i meccanismi predefiniti di intercettazione per gestire malfunzionamenti di tipo strutturale, relazionale (vincoli violati)
-     * ed eccezioni derivate dalle logiche restrittive in vigore per il sistema (es. tentata auto-condivisione).
+     * Innesca l'interazione con il database per il salvataggio dei cambiamenti.
+     * Intercetta e gestisce le eccezioni specifiche per fornire messaggi di feedback
+     * mirati all'utente finale (es. errori di vincolo temporale o auto-condivisione).
      */
     private void performDatabaseUpdate() {
         try {
@@ -989,10 +1047,10 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Processa le eccezioni originate dalla comunicazione col database PostgreSQL tradotte dal controller.
-     * Decodifica il livello d'errore mappandolo allo stato SQL restituito per garantire una restituzione a video human-readable del problema originario.
+     * Decodifica le eccezioni SQL mappando lo stato di errore restituito dal database
+     * (es. violazione dei check constraint di PostgreSQL) in avvisi descrittivi per l'utente.
      *
-     * @param ex L'oggetto eccezione contenente il payload informativo prodotto dai driver JDBC.
+     * @param ex L'eccezione SQL catturata durante l'operazione di persistenza.
      */
     private void handleSqlException(SQLException ex) {
         if ("23514".equals(ex.getSQLState())) {
@@ -1003,9 +1061,9 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Gestisce la logica pre-persistenza per le immagini allegate al task.
-     * Valuta l'esigenza di copiare i nuovi file nella cartella protetta del progetto
-     * ed esegue il processo di dismissione ed eliminazione logico-fisica per le risorse oramai de-sincronizzate o respinte in toto.
+     * Gestisce la persistenza fisica e logica delle immagini.
+     * Provvede all'archiviazione delle nuove risorse, alla rimozione di quelle obsolete
+     * e alla pulizia del file system per prevenire l'accumulo di dati orfani.
      */
     private void handleImagePersistence() {
         String oldPath = todo.getImagePath();
@@ -1032,9 +1090,9 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Converte i dati immessi selettivamente nei controlli UI designati (Data e Ora) all'interno di un univoco oggetto {@link Timestamp}.
+     * Estrae la combinazione di data e ora dai componenti UI restituendola sotto forma di Timestamp SQL.
      *
-     * @return Una strutturazione del timestamp formalmente aderente allo standard SQL preteso dal database, oppure {@code null} per task senza scadenza designata.
+     * @return L'oggetto {@link Timestamp} normalizzato, o {@code null} se i campi sono vacanti.
      */
     private java.sql.Timestamp getExpiryTimestampFromUI() {
         Date date = dateChooser.getDate();
@@ -1046,8 +1104,8 @@ public class TodoDetailsDialog extends JDialog {
     }
 
     /**
-     * Avvia una richiesta d'eliminazione totale ed irreversibile per il task in gestione.
-     * Chiede conferma all'utente prima di avviare l'azione nel database.
+     * Innesca la procedura di cancellazione fisica del task.
+     * Richiede un'ulteriore conferma di sicurezza data l'irreversibilità dell'operazione.
      */
     private void deleteAction() {
         String msg = "Vuoi eliminare definitivamente questo task?";

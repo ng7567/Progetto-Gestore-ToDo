@@ -19,6 +19,9 @@ import java.util.logging.Logger;
  * tra l'interfaccia grafica e il livello di accesso ai dati.
  * Mantiene lo stato della sessione utente corrente e solleva eccezioni di dominio
  * in caso di violazione delle regole di business.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class Controller {
 
@@ -32,6 +35,10 @@ public class Controller {
 
     /**
      * Inizializza il controller e istanzia i DAO necessari per interagire con il database.
+     *
+     * @see dao.UserDAO
+     * @see dao.BoardDAO
+     * @see dao.ToDoDAO
      */
     public Controller() {
         userDAO = new UserDAOImpl();
@@ -43,6 +50,7 @@ public class Controller {
 
     /**
      * Tenta l'autenticazione di un utente nel sistema verificando le credenziali.
+     * Se fallisce lancia un'eccezione di credenziali invalide o SQL.
      *
      * @param username Il nome utente fornito durante il tentativo di accesso.
      * @param password La password fornita (in chiaro) durante il tentativo di accesso.
@@ -194,11 +202,11 @@ public class Controller {
     }
 
     /**
-     * Verifica se una bacheca è bloccata per la rinomina (ad esempio se contiene task condivisi).
+     * Verifica se una bacheca &egrave; bloccata per la rinomina (ad esempio se contiene task condivisi).
      *
      * @param boardTitle Il titolo della bacheca da verificare.
      * @param userId L'ID dell'utente che richiede la verifica.
-     * @return {@code true} se bloccata e non modificabile, {@code false} altrimenti.
+     * @return {@code true} se la bacheca &egrave; bloccata e non modificabile, {@code false} se il titolo della bacheca è modificabile.
      */
     public boolean isBoardLocked(String boardTitle, int userId) {
         return boardDAO.isBoardLocked(boardTitle, userId);
@@ -210,7 +218,7 @@ public class Controller {
      * Operazione irreversibile.
      *
      * @param board L'oggetto bacheca da eliminare.
-     * @return {@code true} se l'eliminazione ha avuto successo.
+     * @return {@code true} se l'eliminazione ha avuto successo, {@code false} se l'eliminazione non &egrave; andata a buon fine
      */
     public boolean deleteBoard(Board board) {
         List<ToDo> todosInBoard = getTodos(board.getTitle());
@@ -259,7 +267,7 @@ public class Controller {
      * Crea un nuovo task (ToDo) nel database a partire da un oggetto di trasferimento dati.
      *
      * @param todoDetails L'oggetto {@link TodoCreationDTO} contenente tutti i dettagli del nuovo task.
-     * @return {@code true} se la creazione ha avuto successo.
+     * @return {@code true} se la creazione ha avuto successo, {@code false} se la creazione non &egrave; andata a buon fine
      * @throws SelfSharingException Se l'utente tenta erroneamente di aggiungere se stesso alla lista dei collaboratori.
      */
     public boolean addTodo(TodoCreationDTO todoDetails) throws SelfSharingException {
@@ -290,7 +298,7 @@ public class Controller {
      *
      * @param todoId    L'identificativo univoco del task.
      * @param completed {@code true} per marcare come completato, {@code false} per rimetterlo da completare.
-     * @return {@code true} se l'aggiornamento ha avuto successo nel database.
+     * @return {@code true} se l'aggiornamento dello stato ha avuto successo nel database, {@code false} se l'aggiornamento dello stato non &egrave; andato a buon fine.
      */
     public boolean setTodoComplete(int todoId, boolean completed) {
         return toDoDAO.toggleCompletion(todoId, completed);
@@ -300,7 +308,7 @@ public class Controller {
      * Aggiorna tutti i campi di un ToDo esistente nel database sovrascrivendoli.
      *
      * @param todo L'oggetto {@link ToDo} contenente i dati aggiornati provenienti dalla UI.
-     * @return {@code true} se l'aggiornamento ha avuto successo.
+     * @return {@code true} se l'aggiornamento ha avuto successo, {@code false} se l'aggiornamento del task non ha avuto successo.
      * @throws SelfSharingException Se si tenta di aggiungere il proprietario ai collaboratori.
      * @throws SQLException Se si verifica un errore durante l'aggiornamento (es. violazione check constraint date).
      */
@@ -314,11 +322,14 @@ public class Controller {
 
     /**
      * Gestisce la rimozione di un task dall'interfaccia dell'utente.
-     * Se l'utente è il proprietario, il task (e la relativa immagine fisica) viene eliminato per tutti.
-     * Se l'utente è un collaboratore, rimuove solo la sua associazione (abbandono condivisione).
+     * Il comportamento varia in base al ruolo dell'utente:
+     * <ul>
+     *     <li><b>Proprietario:</b> il task e la relativa immagine fisica vengono eliminati dal database per tutti gli utenti.</li>
+     *     <li><b>Collaboratore:</b> rimuove esclusivamente l'associazione dell'utente al task (abbandono della condivisione).</li>
+     * </ul>
      *
-     * @param todoId L'identificativo univoco del task.
-     * @return {@code true} se l'operazione (eliminazione o abbandono) ha avuto successo.
+     * @param todoId L'identificativo univoco del task da rimuovere o abbandonare.
+     * @return {@code true} se l'operazione (eliminazione o abbandono) ha avuto successo, {@code false} se il task non esiste o c'è stato un problema nell'eliminazione.
      */
     public boolean deleteTodo(int todoId) {
         ToDo todo = toDoDAO.getTodoById(todoId);
@@ -348,7 +359,8 @@ public class Controller {
      *
      * @param todoId        L'identificativo del task da spostare.
      * @param targetBoardId L'identificativo della bacheca di destinazione.
-     * @return {@code true} se lo spostamento ha avuto successo.
+     * @param currentUserId L'identificativo dell'utente loggato al momento.
+     * @return {@code true} se lo spostamento ha avuto successo, {@code false} se lo spostamento non &egrave; andato a buon fine.
      */
     public boolean moveTodo(int todoId, int targetBoardId, int currentUserId) {
         return toDoDAO.updateBoardId(todoId, targetBoardId, currentUserId);
@@ -361,7 +373,7 @@ public class Controller {
      * @param todoId L'identificativo univoco del task.
      * @param newPosition Il nuovo valore numerico intero della posizione.
      * @param role        Il ruolo dell'utente (OWNER o SHARED).
-     * @return {@code true} se l'aggiornamento ha avuto successo nel database.
+     * @return {@code true} se l'aggiornamento ha avuto successo nel database, {@code false} se l'aggiornamento non &egrave; andato a buon fine.
      */
     public boolean updateTodoPosition(int todoId, int newPosition, String role) {
         if (currentUser == null) return false;

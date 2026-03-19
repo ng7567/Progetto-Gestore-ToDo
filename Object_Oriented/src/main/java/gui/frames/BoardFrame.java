@@ -26,31 +26,55 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Finestra principale per la visualizzazione e la gestione dei task all'interno
- * di una specifica bacheca. Fornisce funzionalità avanzate di filtraggio,
- * ricerca e interazione sugli elementi tramite drag &amp; drop.
+ * Rappresenta la finestra principale dedicata alla visualizzazione e alla gestione
+ * dei task contenuti all'interno di una specifica bacheca (Board).
+ * Fornisce strumenti per il filtraggio temporale, la ricerca testuale e l'interazione
+ * mediante trascinamento (Drag &amp; Drop). Coordina l'aggiornamento dinamico della vista
+ * in risposta ai mutamenti dei dati e gestisce la transizione verso i dialoghi di dettaglio
+ * e creazione dei task.
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class BoardFrame extends JFrame {
 
+    /** Il riferimento al gestore della logica di business per il recupero e la manipolazione dei dati. */
     private final transient Controller controller;
+
+    /** L'entità bacheca attualmente visualizzata e gestita nel frame. */
     private final transient Board currentBoard;
+
+    /** Il pannello personalizzato adibito all'ospitare la collezione verticale delle card dei task. */
     private ScrollablePanel todosPanel;
 
-    // Filtri
+    // --- Filtri di Visualizzazione ---
+
+    /** Il campo di testo per l'immissione della stringa di ricerca testuale. */
     private JTextField txtSearch;
+
+    /** Il selettore booleano per filtrare esclusivamente i task in scadenza nella giornata odierna. */
     private JCheckBox chkToday;
+
+    /** Il selettore booleano per attivare il filtraggio basato su una data limite specifica. */
     private JCheckBox chkByDate;
+
+    /** Il componente calendario per la selezione della data target per il filtro temporale. */
     private JDateChooser filterDateChooser;
 
-    // Dati
+    // --- Collezioni Dati ---
+
+    /** L'elenco integrale dei task associati alla bacheca, recuperato dal database. */
     private transient List<ToDo> allTodos;
+
+    /** L'elenco filtrato dei task attualmente renderizzati a video. */
     private transient List<ToDo> displayedTodos;
 
     /**
-     * Inizializza una nuova istanza della finestra BoardFrame.
+     * Inizializza il frame della bacheca configurando lo stato iniziale e le dimensioni di visualizzazione.
+     * Esegue il primo caricamento dei dati e predispone i parametri di chiusura e centratura.
      *
-     * @param controller Il {@link Controller} dell'applicazione per le operazioni di business.
-     * @param board      La bacheca ({@link Board}) correntemente selezionata per la visualizzazione.
+     * @param controller Il riferimento al Controller principale dell'applicazione.
+     * @param board      La bacheca selezionata di cui mostrare i contenuti.
      */
     public BoardFrame(Controller controller, Board board) {
         super("ToDo App - " + board.getTitle());
@@ -70,7 +94,9 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Costruisce e posiziona tutti i componenti grafici dell'interfaccia utente.
+     * Struttura gerarchicamente i componenti grafici del frame.
+     * Organizza l'interfaccia in macro-aree: testata navigabile, barra dei filtri,
+     * area di scorrimento centrale per i task e sezione dei comandi inferiori.
      */
     private void initUI() {
         JPanel mainPanel = GuiUtils.createGradientPanel();
@@ -115,11 +141,11 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Costruisce l'intestazione dell'applicazione e configura le azioni di navigazione.
-     * Collega il bottone "Dettagli" alla finestra di dialogo per la modifica della bacheca
-     * e definisce le callback per il ritorno alla Home e il ricaricamento della finestra.
+     * Configura l'intestazione personalizzata del frame integrando le funzioni di navigazione.
+     * Associa le callback per il ripristino della bacheca, il ritorno alla schermata Home
+     * e l'apertura dei metadati descrittivi della bacheca stessa.
      *
-     * @return Il componente {@link AppHeader} configurato e pronto all'uso.
+     * @return L'oggetto {@link AppHeader} configurato con le azioni di contesto.
      */
     private AppHeader createHeader() {
         Runnable reload = () -> GuiUtils.reloadWindow(this, () -> new BoardFrame(controller, currentBoard));
@@ -134,11 +160,11 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Costruisce il pannello degli strumenti per il filtraggio dinamico dei task.
-     * Configura i listener per la ricerca testuale "real-time" e i selettori di data,
-     * assicurando l'esclusione mutua tra il filtro giornaliero e quello per data specifica.
+     * Istanzia il pannello dei controlli deputati al filtraggio dinamico della collezione.
+     * Implementa listener per la ricerca "real-time" e gestisce la logica di mutua esclusione
+     * tra le selezioni temporali (Oggi vs Data specifica) per garantire la coerenza dell'input.
      *
-     * @return Un {@link JPanel} contenente i controlli di ricerca e i filtri temporali.
+     * @return Il pannello ({@code JPanel}) contenente gli strumenti di filtraggio.
      */
     private JPanel createFilterBar() {
         JPanel filterPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 15, 15));
@@ -150,8 +176,11 @@ public class BoardFrame extends JFrame {
         txtSearch.setToolTipText("Cerca per titolo o descrizione...");
 
         DocumentListener docListener = new DocumentListener() {
+            /** {@inheritDoc} */
             public void insertUpdate(DocumentEvent e) { applyFilters(); }
+            /** {@inheritDoc} */
             public void removeUpdate(DocumentEvent e) { applyFilters(); }
+            /** {@inheritDoc} */
             public void changedUpdate(DocumentEvent e) { applyFilters(); }
         };
         txtSearch.getDocument().addDocumentListener(docListener);
@@ -202,7 +231,8 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Ricarica integralmente l'elenco dei task dal database.
+     * Sincronizza lo stato locale recuperando la collezione aggiornata dei task dal database.
+     * Innesca automaticamente il ricalcolo dei filtri in seguito all'acquisizione dei nuovi dati.
      */
     public void refreshDataFromDB() {
         allTodos = controller.getTodos(currentBoard.getTitle());
@@ -210,9 +240,9 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Applica i criteri di ricerca e i filtri temporali alla collezione dei task.
-     * Utilizza le API Stream di Java per filtrare la lista originale e richiama
-     * successivamente la procedura di rendering per aggiornare la vista grafica.
+     * Processa la collezione integrale dei task applicando i parametri di ricerca correnti.
+     * Sfrutta le operazioni aggregate per isolare gli elementi conformi
+     * e demanda la ricostruzione grafica al metodo di rendering.
      */
     private void applyFilters() {
         String query = txtSearch.getText().trim().toLowerCase();
@@ -234,13 +264,11 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Verifica se un determinato task soddisfa i criteri della ricerca testuale.
-     * Esegue il confronto, ignorando la differenza tra maiuscole e minuscole,
-     * sul titolo e sulla descrizione dell'oggetto.
+     * Valuta se l'istanza del task soddisfa i requisiti della ricerca testuale.
      *
-     * @param t     Il task da sottoporre a verifica.
-     * @param query La stringa di ricerca inserita dall'utente.
-     * @return {@code true} se la query è vuota o se è contenuta nel titolo/descrizione.
+     * @param t     L'oggetto ToDo soggetto a verifica.
+     * @param query La stringa di ricerca normalizzata in minuscolo.
+     * @return {@code true} se il testo è presente nel titolo o nella descrizione.
      */
     private boolean matchesTextQuery(ToDo t, String query) {
         if (query.isEmpty()) return true;
@@ -250,11 +278,11 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Accerta se la data di scadenza di un task coincide con la giornata odierna.
+     * Accerta se il task scade precisamente nella giornata odierna.
      *
-     * @param t         Il task da analizzare.
-     * @param todayZero La data di oggi azzerata nelle componenti di ora, minuti e secondi.
-     * @return {@code true} se la scadenza del task cade nel giorno corrente.
+     * @param t         L'oggetto ToDo soggetto a verifica.
+     * @param todayZero La data odierna normalizzata all'inizio del giorno.
+     * @return {@code true} se la scadenza coincide con la data odierna.
      */
     private boolean matchesTodayFilter(ToDo t, Date todayZero) {
         if (t.getExpiryDate() == null) return false;
@@ -265,13 +293,13 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Verifica se la scadenza di un task rientra nell'intervallo temporale tra oggi
-     * e la data limite selezionata.
+     * Verifica se la scadenza del task ricade nel range temporale definito tra l'istante
+     * attuale e la data target selezionata.
      *
-     * @param t          Il task da controllare.
-     * @param targetDate La data limite superiore del filtro.
-     * @param todayZero  La data di oggi (limite inferiore).
-     * @return {@code true} se il task scade entro il periodo specificato.
+     * @param t          L'oggetto ToDo soggetto a verifica.
+     * @param targetDate La data limite superiore selezionata.
+     * @param todayZero  Il riferimento temporale odierno.
+     * @return {@code true} se il task scade entro la data limite e non è già scaduto rispetto a oggi.
      */
     private boolean matchesDateFilter(ToDo t, Date targetDate, Date todayZero) {
         if (t.getExpiryDate() == null) return false;
@@ -281,9 +309,10 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Aggiorna il pannello grafico ricostruendo le card dei task attualmente visibili.
-     * In caso di lista vuota, visualizza un messaggio informativo; altrimenti, istanzia
-     * le {@link TaskCard} associando loro i listener per il drag & drop e i menu contestuali.
+     * Rigenera dinamicamente le componenti grafiche nel pannello dei task.
+     * Determina se abilitare le funzioni di riordino (Drag &amp; Drop) in base all'assenza
+     * di filtri attivi, garantendo che le operazioni di spostamento non avvengano su
+     * una vista parziale della bacheca.
      */
     private void renderTodos() {
         todosPanel.removeAll();
@@ -304,8 +333,7 @@ public class BoardFrame extends JFrame {
                     this::refreshDataFromDB
             );
 
-            // Abilita il drag solo se non ci sono filtri attivi
-            // Confronta la dimensione della lista filtrata con quella totale
+            // Blocca il trascinamento se i task visualizzati sono un sottoinsieme di quelli totali
             boolean filtersActive = displayedTodos.size() != allTodos.size();
             dragListener.setEnabled(!filtersActive);
 
@@ -315,7 +343,6 @@ public class BoardFrame extends JFrame {
 
                 applyDragListenerRecursively(card, dragListener);
 
-                // Se i filtri sono attivi, cambia il cursore per far capire all'utente che il drag è disabilitato
                 if (filtersActive) {
                     card.setCursor(Cursor.getDefaultCursor());
                     dragListener.setEnabled(false);
@@ -334,13 +361,12 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Applica in maniera ricorsiva il listener per le operazioni di trascinamento.
-     * Analizza la gerarchia dei componenti per garantire che il drag & drop funzioni
-     * cliccando su qualsiasi area della card, escludendo però i componenti interattivi
-     * come bottoni o checkbox per non inibirne il funzionamento.
+     * Propaga ricorsivamente il listener degli eventi del mouse lungo l'albero dei componenti.
+     * Esclude esplicitamente i controlli interattivi (bottoni, checkbox, combo box) per
+     * non comprometterne l'usabilità nativa.
      *
-     * @param container Il contenitore o componente da processare.
-     * @param listener  L'ascoltatore eventi per il movimento e il click del mouse.
+     * @param container Il componente genitore da cui avviare la scansione.
+     * @param listener  L'ascoltatore eventi per la gestione coordinata di drag e click.
      */
     private void applyDragListenerRecursively(Container container, TaskDragListener listener) {
         container.addMouseListener(listener);
@@ -361,9 +387,9 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Azzera le componenti di ora, minuto, secondo e millisecondo in un oggetto {@link Calendar}.
+     * Normalizza un'istanza di calendario azzerando ora, minuto e secondo.
      *
-     * @param cal L'istanza di calendario da normalizzare.
+     * @param cal L'oggetto {@link Calendar} da azzerare.
      */
     private void resetTime(Calendar cal) {
         cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -373,10 +399,10 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Calcola un oggetto Date rappresentante l'ultimo istante della giornata indicata.
+     * Genera una data corrispondente all'ultimo istante utile (23:59:59.999) del giorno fornito.
      *
-     * @param date La data di riferimento.
-     * @return Un'istanza {@link Date} impostata alle ore 23:59:59 del giorno fornito.
+     * @param date La data di base.
+     * @return Un'istanza {@link Date} normalizzata alla fine della giornata, o {@code null}.
      */
     private Date endOfDay(Date date) {
         if (date == null) return null;
@@ -390,12 +416,12 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Visualizza o nasconde un velo semitrasparente (Glass Pane) sopra l'interfaccia.
-     * Viene impiegato per inibire le interazioni con la finestra principale durante
-     * l'apertura di dialoghi modali e per gestire la chiusura automatica al click esterno.
+     * Attiva o disabilita un Glass Pane per bloccare
+     * l'interazione con il frame principale. Gestisce opzionalmente la chiusura
+     * automatica dei dialoghi in risposta al click sull'overlay.
      *
-     * @param show          Specifica se attivare o disattivare l'oscuramento.
-     * @param onClickAction L'azione di callback da eseguire al click sull'overlay.
+     * @param show          Flag per determinare lo stato di visibilità dell'oscuramento.
+     * @param onClickAction L'azione di callback da eseguire alla pressione sull'area oscurata.
      */
     public void showOverlay(boolean show, Runnable onClickAction) {
         if (show) {
@@ -406,7 +432,7 @@ public class BoardFrame extends JFrame {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     if (onClickAction != null) onClickAction.run();
-                    e.consume();
+                    e.consume(); // Interrompe la propagazione dell'evento verso il basso
                 }
             });
             setGlassPane(overlay);
@@ -418,16 +444,20 @@ public class BoardFrame extends JFrame {
     }
 
     /**
-     * Sotto-classe progettata per ottimizzare la visualizzazione dei componenti
-     * all'interno di un {@link JScrollPane}.
-     * Forza il pannello a seguire la larghezza della viewport, prevenendo la
-     * comparsa della barra di scorrimento orizzontale e favorendo il wrap dei contenuti.
+     * Sotto-classe specializzata per il pannello dei task che implementa {@link Scrollable}.
+     * Garantisce che il pannello segua la larghezza della viewport del JScrollPane,
+     * prevenendo lo scorrimento orizzontale.
      */
     private static class ScrollablePanel extends JPanel implements Scrollable {
+        /** {@inheritDoc} */
         @Override public Dimension getPreferredScrollableViewportSize() { return getPreferredSize(); }
+        /** {@inheritDoc} */
         @Override public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) { return 16; }
+        /** {@inheritDoc} */
         @Override public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) { return 16; }
+        /** {@inheritDoc} */
         @Override public boolean getScrollableTracksViewportWidth() { return true; }
+        /** {@inheritDoc} */
         @Override public boolean getScrollableTracksViewportHeight() { return false; }
     }
 }

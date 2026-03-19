@@ -1,14 +1,17 @@
 package exception;
 
 /**
- * Eccezione personalizzata per gestire errori relativi alle regole di business
- * dell'applicazione (es. violazioni di vincoli logici, trigger del database,
+ * Rappresenta un'eccezione personalizzata sollevata in caso di violazione delle regole di business
+ * dell'applicazione (es. violazioni di vincoli logici, trigger del database o
  * operazioni non consentite su dati condivisi).
+ *
+ * @author Nunzio Grasso (Matricola: N86005509)
+ * @version 1.0
  */
 public class BusinessLogicException extends Exception {
 
     /**
-     * Costruttore per un messaggio di errore semplice.
+     * Inizializza l'eccezione specificando esclusivamente un messaggio di errore testuale.
      *
      * @param message Il messaggio descrittivo dell'errore.
      */
@@ -18,10 +21,11 @@ public class BusinessLogicException extends Exception {
     }
 
     /**
-     * Costruttore per un messaggio di errore concatenato a un'eccezione originale.
+     * Inizializza l'eccezione specificando un messaggio di errore e incapsulando
+     * l'eccezione originaria (pattern dell'exception chaining).
      *
-     * @param message Il messaggio descrittivo.
-     * @param cause   L'eccezione originale (es. SQLException) che ha causato il problema.
+     * @param message Il messaggio testuale descrittivo dell'errore.
+     * @param cause   L'eccezione originale (es. {@link java.sql.SQLException}) che ha scatenato il problema.
      */
     public BusinessLogicException(String message, Throwable cause) {
         super(message, cause);
